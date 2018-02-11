@@ -94,15 +94,7 @@ checkandaddflag ( -fcolor-diagnostics CMAKE_CXX_FLAGS )
 add_subdirectory ( src )
 if ( NOT SUBBUILD_DVJSON AND BUILD_TESTING )
     add_subdirectory ( test )
-
-    add_custom_target ( installtest
-            COMMAND ${CMAKE_COMMAND} -E remove_directory installtest
-            COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/install_manifest*
-            COMMAND ${CMAKE_COMMAND} -E env DESTDIR=installtest ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install
-            )
 endif ()
-
-include ( CPack )
 
 include ( CMakePackageConfigHelpers )
 write_basic_package_version_file ( "${CMAKE_CURRENT_BINARY_DIR}/dvjsonVersion.cmake"
@@ -121,3 +113,27 @@ if ( NOT SUBBUILD_DVJSON )
   message ( STATUS "CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER}" )
 endif ()
 export ( PACKAGE dvjson )
+if ( NOT SUBBUILD_DVJSON )
+  set ( CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR} )
+  set ( CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR} )
+  set ( CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH} )
+  set ( CPACK_PACKAGE_VENDOR "David van Laatum" )
+  set ( CPACK_PACKAGE_DESCRIPTION_SUMMARY "dvjson C++ library" )
+  set ( CPACK_PROJECT_CONFIG_FILE ${CMAKE_SOURCE_DIR}/CPack.cmake )
+  include ( CPack )
+  include ( CPackComponent )
+
+  foreach ( C ${CPACK_COMPONENTS_ALL} )
+    list ( APPEND COMMANDS COMMAND ${CMAKE_COMMAND} -E env DESTDIR=installtest ${CMAKE_COMMAND} -DCOMPONENT=${C} -P ${CMAKE_BINARY_DIR}/cmake_install.cmake )
+  endforeach ()
+  if ( Unspecified IN_LIST CPACK_COMPONENTS_ALL )
+    message ( WARNING "Files that have not been assigned to a category exist" )
+  endif ()
+  if ( BUILD_TESTING )
+    add_custom_target ( installtest
+                        COMMAND ${CMAKE_COMMAND} -E remove_directory installtest
+                        COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/install_manifest*
+                        ${COMMANDS}
+                        )
+  endif ()
+endif ()
