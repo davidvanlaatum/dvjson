@@ -19,5 +19,7 @@ install ( TARGETS dvjson EXPORT dvjson DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLI
 target_include_directories ( dvjson PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/dvjson/> )
-iwyu_target ( dvjson )
-clang_tidy_target ( dvjson )
+if ( NOT SUBBUILD_DVJSON )
+  iwyu_target ( dvjson )
+  clang_tidy_target ( dvjson )
+endif ()
