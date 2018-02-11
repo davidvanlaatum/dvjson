@@ -14,6 +14,7 @@
 #include <vector>                 // for vector
 #include "JSONSerialiser.h"       // for JSONConstructor, JSONSerialiser, PriorityTag
 #include "jsonfwd.h"              // for JSONTypes::objectType, JSONTypes::arrayType, JSONPtr, Type, JSONTypes::keyType, JSONTypes::stringType, JSONTypes::v...
+#include "JSONObject.h"
 
 namespace dv {
   namespace json {
@@ -30,8 +31,8 @@ namespace dv {
       JSON &operator=( const JSON &other ) = default;
       JSON &operator=( JSON &&other ) = default;
       template<typename T> inline JSON &operator=( const T &v );
-      JSON &operator[]( const keyType &key ) __attribute__((pure));
-      JSON &operator[]( indexType index ) __attribute__((pure));
+      JSON &operator[]( const keyType &key ) PURE;
+      JSON &operator[]( indexType index ) PURE;
       bool operator==( const JSON &other ) const;
       bool operator==( Type ) const noexcept;
       bool operator!=( Type ) const noexcept;

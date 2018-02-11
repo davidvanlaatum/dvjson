@@ -1,15 +1,16 @@
 add_library ( dvjson SHARED
-        json.h
-        JSONParser.cpp JSONParser.h
-        JSONPath.cpp JSONPath.h
-        JSONValue.cpp JSONValue.h
-        jsonfwd.h
-        JSONSerialiser.h
-        JSONDiffListener.cpp JSONDiffListener.h
-        JSONConverters.h
-        JSONException.cpp JSONException.h
-        JSONErrorCollector.cpp JSONErrorCollector.h
-        JSONContext.h JSONContext.cpp )
+              json.h
+              JSONParser.cpp JSONParser.h
+              JSONPath.cpp JSONPath.h
+              JSONValue.cpp JSONValue.h
+              jsonfwd.h
+              JSONSerialiser.h
+              JSONDiffListener.cpp JSONDiffListener.h
+              JSONConverters.h
+              JSONException.cpp JSONException.h
+              JSONErrorCollector.cpp JSONErrorCollector.h
+              JSONContext.h JSONContext.cpp
+              JSONObject.cpp JSONObject.h )
 target_link_libraries ( dvjson PUBLIC Boost::boost )
 set_target_properties ( dvjson PROPERTIES VERSION ${PROJECT_VERSION} )
 get_target_property ( HEADERS dvjson SOURCES )

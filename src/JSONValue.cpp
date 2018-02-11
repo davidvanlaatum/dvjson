@@ -18,9 +18,6 @@ JSON &JSON::operator[]( const JSON::keyType &key ) {
     value = objectType();
   }
   auto &rt = boost::get<objectType>( value )[key];
-  if ( !rt ) {
-    rt = std::make_shared<JSON>();
-  }
   return *rt;
 }
 
@@ -85,6 +82,7 @@ bool JSON::compare( const JSON &other, JSONDiffListener &listener, const JSONPat
         auto it1 = keys1.begin(), it2 = keys2.begin();
         while ( it1 != keys1.end() && it2 != keys2.end() ) {
           if ( *it1 == *it2 ) {
+
             if ( !obj1.find( *it1 )->second->compare( *obj2.find( *it2 )->second, listener, path / *it1 ) ) {
               rt = false;
               if ( !listener.isInterested() ) {
@@ -153,7 +151,7 @@ bool JSON::operator==( const JSON &other ) const {
 
 class JSONTypeVisitor : public boost::static_visitor<Type> {
  public:
-#define TYPE( t, T ) Type operator()( const t ) { return Type::T; }
+#define TYPE( t, T ) Type operator()( const t & ) { return Type::T; }
 
   TYPE( JSON::nullType, NULLVALUE )
 
@@ -163,11 +161,11 @@ class JSONTypeVisitor : public boost::static_visitor<Type> {
 
   TYPE( JSON::doubleType, DOUBLE )
 
-  TYPE( JSON::stringType &, STRING )
+  TYPE( JSON::stringType, STRING )
 
-  TYPE( JSON::objectType &, OBJECT )
+  TYPE( JSON::objectType, OBJECT )
 
-  TYPE( JSON::arrayType &, ARRAY )
+  TYPE( JSON::arrayType, ARRAY )
 };
 
 Type JSON::type() const noexcept {
@@ -216,7 +214,7 @@ void JSON::dump( std::ostream &os, unsigned int indent ) const {
   dump( os, indent, 1 );
 }
 
-static std::string doIndent( unsigned int indent, unsigned int level ) noexcept __attribute__((pure));
+static std::string doIndent( unsigned int indent, unsigned int level ) noexcept PURE;
 
 static std::string doIndent( unsigned int indent, unsigned int level ) noexcept {
   std::string rt;

@@ -19,8 +19,14 @@
   #else
     #define PURE
   #endif
+  #if __has_attribute( unused )
+    #define UNUSED __attribute__((unused))
+  #else
+    #define UNUSED
+  #endif
 #else
   #define PURE
+  #define UNUSED
 #endif
 
 namespace dv {
@@ -52,6 +58,7 @@ namespace dv {
     typedef std::shared_ptr<JSONErrorCollector> JSONErrorCollectorPtr;
     class JSONErrorCollectorThrow; // IWYU pragma: keep
     class JSONErrorCollectorImpl; // IWYU pragma: keep
+    class JSONObject;
     template<unsigned N> struct PriorityTag : PriorityTag<N - 1> {};
     template<> struct PriorityTag<0> {};
 
@@ -61,7 +68,7 @@ namespace dv {
       typedef bool boolType;
       typedef double doubleType;
       typedef std::string stringType;
-      typedef std::unordered_map<stringType, JSONPtr> objectType;
+      typedef JSONObject objectType;
       typedef std::vector<JSONPtr> arrayType;
       typedef stringType keyType;
       typedef boost::variant<nullType, intType, boolType, doubleType, stringType, objectType, arrayType> valueType;
@@ -125,14 +132,6 @@ namespace dv {
           static const bool value = is_convertible<X, Y>::value;
         };
       template<typename X, typename Y> struct variant_is_convertible<const X, Y> : public variant_is_convertible<X, Y> {};
-
-      static_assert( variant_is_convertible<const char[], JSONTypes::valueType>::value, "Should be convertible" );
-
-      static_assert( variant_has_type<std::string, JSONTypes::valueType>::value, "should have" );
-      static_assert( variant_has_type<const std::string, JSONTypes::valueType>::value, "should have" );
-      static_assert( variant_has_type<std::string &, JSONTypes::valueType>::value, "should have" );
-      static_assert( variant_has_type<const std::string &, JSONTypes::valueType>::value, "should have" );
-      static_assert( !variant_has_type<float, JSONTypes::valueType>::value, "shouldn't have" );
     }
   }
 }

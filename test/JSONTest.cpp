@@ -6,6 +6,15 @@
 
 using namespace testing;
 using namespace dv::json;
+using namespace dv::json::detail;
+
+static_assert( variant_is_convertible<const char[], JSONTypes::valueType>::value, "Should be convertible" );
+
+static_assert( variant_has_type<std::string, JSONTypes::valueType>::value, "should have" );
+static_assert( variant_has_type<const std::string, JSONTypes::valueType>::value, "should have" );
+static_assert( variant_has_type<std::string &, JSONTypes::valueType>::value, "should have" );
+static_assert( variant_has_type<const std::string &, JSONTypes::valueType>::value, "should have" );
+static_assert( !variant_has_type<float, JSONTypes::valueType>::value, "shouldn't have" );
 
 class JSONTest : public ::testing::Test {
   void SetUp() override {
