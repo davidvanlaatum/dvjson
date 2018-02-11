@@ -1,0 +1,19 @@
+[
+    { "include": [ "<bits/shared_ptr.h>", "private", "<memory>", "public" ] },
+    { "include": [ "<boost/variant/detail/substitute.hpp>", "public", "<boost/preprocessor.hpp>", "public" ] },
+    { "include": [ "<boost/variant/variant.hpp>", "public", "<boost/variant.hpp>", "public" ] },
+    { "include": [ "<boost/type_index.hpp>", "private", "<boost/variant.hpp>", "public" ] },
+    { "include": [ "<boost/variant/static_visitor.hpp>", "private", "<boost/variant.hpp>", "public" ] },
+    { "include": [ "<boost/variant/variant_fwd.hpp>", "private", "<boost/variant.hpp>", "public" ] },
+    { "include": [ "<bits/stdint-intn.h>", "private", "<cstdint>", "public" ] },
+    { "include": [ "<gtest/gtest-message.h>", "private", "<gtest/gtest.h>", "public" ] },
+    { "include": [ "<gtest/gtest-test-part.h>", "private", "<gtest/gtest.h>", "public" ] },
+    { "include": [ "<bits/exception.h>", "private", "<stdexcept>", "public" ] },
+    { "include": [ "<bits/std_function.h>", "private", "<functional>", "public" ] },
+    { "include": [ "<boost/algorithm/string/predicate.hpp>", "private", "<boost/algorithm/string.hpp>", "public" ] },
+    { "include": [ "<ext/alloc_traits.h>", "private", "<unordered_map>", "public" ] },
+    { "include": [ "<ext/alloc_traits.h>", "private", "<unordered_set>", "public" ] },
+    { "symbol": [ "boost::variant<>", "public", "<boost/variant.hpp>", "public" ] },
+    { "symbol": [ "boost::get<>", "public", "<boost/variant/get.hpp>", "public" ] },
+    { "symbol": [ "int64_t", "public", "<cstdint>", "public" ] }
+]

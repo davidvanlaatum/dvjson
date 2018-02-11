@@ -1,0 +1,49 @@
+language: cpp
+script:
+    - chmod a+x scripts/*
+    - mkdir -p build
+    - cd build
+    - cmake ../ -G Ninja ${CMAKE_OPTIONS}
+    - cmake --build .
+    - ctest -V
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/boost-1.66.0
+    - ${TRAVIS_BUILD_DIR}/build/external
+before_install: |
+              if [[ "${BOOST_VERSION}" != "" ]]; then
+                BOOST_DIR=boost-${BOOST_VERSION}
+                if [[ -z "$(ls -A ${BOOST_DIR})" ]]; then
+                    BOOST_URL="http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_${BOOST_VERSION//\./_}.tar.gz"
+                    mkdir -p ${BOOST_DIR}
+                    { travis_retry wget -O - ${BOOST_URL} | tar --strip-components=1 -xz -C ${BOOST_DIR}; } || exit 1
+                fi
+                CMAKE_OPTIONS+=" -DBOOST_ROOT=${BOOST_DIR}"
+              fi
+matrix:
+  include:
+    - os: osx
+      before_install:
+        - brew install ninja
+    - os: linux
+      compiler: clang
+      env: BOOST_VERSION=1.66.0
+      addons:
+          apt:
+            sources:
+              - george-edison55-precise-backports
+            packages:
+              - cmake-data
+              - cmake
+              - ninja-build
+    - os: linux
+      compiler: gcc
+      env: BOOST_VERSION=1.66.0
+      addons:
+          apt:
+            sources:
+              - george-edison55-precise-backports
+            packages:
+              - cmake-data
+              - cmake
+              - ninja-build
