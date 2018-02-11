@@ -9,6 +9,10 @@
 #include "JSONValue.h"
 #include "JSONConverters.h"
 #include "JSONException.h"
+#include "JSONPath.h"
+#include "JSONContext.h"
+#include "JSONErrorCollector.h"
+#include "JSONParser.h"
 // IWYU pragma: end_exports
 
 #endif //DVJSON_JSON_H
