@@ -116,6 +116,8 @@ install ( FILES "${CMAKE_CURRENT_BINARY_DIR}/dvjsonVersion.cmake"
         DESTINATION lib/cmake/dvjson
         COMPONENT Devel
         )
-feature_summary ( WHAT ALL )
+if ( NOT SUBBUILD_DVJSON )
+  feature_summary ( WHAT ALL )
+  message ( STATUS "CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER}" )
+endif ()
 export ( PACKAGE dvjson )
-message ( STATUS "CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER}" )
