@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONEXCEPTION_H
-#define DVFORMSCPP_JSONEXCEPTION_H
+#ifndef DVJSON_JSONEXCEPTION_H
+#define DVJSON_JSONEXCEPTION_H
 
 #include <stdexcept>
 #include <string>
@@ -23,4 +23,4 @@ namespace dv {
   }
 }
 
-#endif //DVFORMSCPP_JSONEXCEPTION_H
+#endif //DVJSON_JSONEXCEPTION_H

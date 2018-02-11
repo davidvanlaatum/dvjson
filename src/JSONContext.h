@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONCONTEXT_H
-#define DVFORMSCPP_JSONCONTEXT_H
+#ifndef DVJSON_JSONCONTEXT_H
+#define DVJSON_JSONCONTEXT_H
 
 #include "jsonfwd.h"   // for PriorityTag, PURE
 #include <functional>  // for function
@@ -89,4 +89,4 @@ namespace dv {
   }
 }
 
-#endif //DVFORMSCPP_JSONCONTEXT_H
+#endif //DVJSON_JSONCONTEXT_H

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSON_H
-#define DVFORMSCPP_JSON_H
+#ifndef DVJSON_JSON_H
+#define DVJSON_JSON_H
 
 // IWYU pragma: begin_exports
 #include "jsonfwd.h"
@@ -11,4 +11,4 @@
 #include "JSONException.h"
 // IWYU pragma: end_exports
 
-#endif //DVFORMSCPP_JSON_H
+#endif //DVJSON_JSON_H

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONERRORCOLLECTOR_H
-#define DVFORMSCPP_JSONERRORCOLLECTOR_H
+#ifndef DVJSON_JSONERRORCOLLECTOR_H
+#define DVJSON_JSONERRORCOLLECTOR_H
 
 #include "jsonfwd.h" // IWYU pragma: keep
 #include <string>
@@ -34,4 +34,4 @@ namespace dv {
   }
 }
 
-#endif //DVFORMSCPP_JSONERRORCOLLECTOR_H
+#endif //DVJSON_JSONERRORCOLLECTOR_H

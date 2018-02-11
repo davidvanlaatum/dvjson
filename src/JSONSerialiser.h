@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONSERIALISER_H
-#define DVFORMSCPP_JSONSERIALISER_H
+#ifndef DVJSON_JSONSERIALISER_H
+#define DVJSON_JSONSERIALISER_H
 
 #include "jsonfwd.h"                // for JSONErrorCollectorPtr, defaultErrorCollector, emptyPath, JSONTypes, JSONTypes::valueType, JSONTypes::stringType
 #include "JSONErrorCollector.h"     // for JSONErrorCollector
@@ -376,4 +376,4 @@ namespace dv {
       };
   }
 }
-#endif //DVFORMSCPP_JSONSERIALISER_H
+#endif //DVJSON_JSONSERIALISER_H

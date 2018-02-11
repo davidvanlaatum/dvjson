@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONPARSER_H
-#define DVFORMSCPP_JSONPARSER_H
+#ifndef DVJSON_JSONPARSER_H
+#define DVJSON_JSONPARSER_H
 
 #include <iosfwd>
 #include <string>
@@ -25,4 +25,4 @@ namespace dv {
   }
 }
 
-#endif //DVFORMSCPP_JSONPARSER_H
+#endif //DVJSON_JSONPARSER_H

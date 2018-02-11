@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONVALUE_H
-#define DVFORMSCPP_JSONVALUE_H
+#ifndef DVJSON_JSONVALUE_H
+#define DVJSON_JSONVALUE_H
 
 #include <stddef.h>               // for size_t
 #include <boost/variant.hpp>      // for static_visitor, type_info
@@ -212,4 +212,4 @@ namespace dv {
   }
 }
 
-#endif //DVFORMSCPP_JSONVALUE_H
+#endif //DVJSON_JSONVALUE_H

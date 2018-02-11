@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONCONVERTERS_H
-#define DVFORMSCPP_JSONCONVERTERS_H
+#ifndef DVJSON_JSONCONVERTERS_H
+#define DVJSON_JSONCONVERTERS_H
 
 #include "JSONSerialiser.h"   // for variant_has_type, JSONSerialiser
 #include "JSONValue.h"        // for JSON
@@ -120,4 +120,4 @@ namespace dv {
   }
 }
 
-#endif //DVFORMSCPP_JSONCONVERTERS_H
+#endif //DVJSON_JSONCONVERTERS_H

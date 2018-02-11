@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONDIFFLISTENER_H
-#define DVFORMSCPP_JSONDIFFLISTENER_H
+#ifndef DVJSON_JSONDIFFLISTENER_H
+#define DVJSON_JSONDIFFLISTENER_H
 
 #include <iosfwd>  // for ostream
 #include <map>     // for map
@@ -39,4 +39,4 @@ namespace dv {
   }
 }
 
-#endif //DVFORMSCPP_JSONDIFFLISTENER_H
+#endif //DVJSON_JSONDIFFLISTENER_H

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONPATH_H
-#define DVFORMSCPP_JSONPATH_H
+#ifndef DVJSON_JSONPATH_H
+#define DVJSON_JSONPATH_H
 
 #include "jsonfwd.h"
 #include <iosfwd>                     // for ostream
@@ -37,4 +37,4 @@ namespace dv {
   }
 }
 
-#endif //DVFORMSCPP_JSONPATH_H
+#endif //DVJSON_JSONPATH_H

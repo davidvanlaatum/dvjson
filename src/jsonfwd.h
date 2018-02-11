@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DVFORMSCPP_JSONVALUEFWD_H
-#define DVFORMSCPP_JSONVALUEFWD_H
+#ifndef DVJSON_JSONVALUEFWD_H
+#define DVJSON_JSONVALUEFWD_H
 
 #include <stddef.h>           // for size_t
 #include <boost/variant.hpp>  // for variant
@@ -137,4 +137,4 @@ namespace dv {
   }
 }
 
-#endif //DVFORMSCPP_JSONVALUEFWD_H
+#endif //DVJSON_JSONVALUEFWD_H

@@ -14,6 +14,6 @@ target_link_libraries ( dvjson PUBLIC Boost::boost )
 install ( TARGETS dvjson EXPORT dvjson DESTINATION ${CMAKE_INSTALL_LIBDIR} )
 target_include_directories ( dvjson PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/dvformscpp/> )
+        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/dvjson/> )
 iwyu_target ( dvjson )
 clang_tidy_target ( dvjson )
