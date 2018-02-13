@@ -14,7 +14,6 @@
 #include <vector>                 // for vector
 #include "JSONSerialiser.h"       // for JSONConstructor, JSONSerialiser, PriorityTag
 #include "jsonfwd.h"              // for JSONTypes::objectType, JSONTypes::arrayType, JSONPtr, Type, JSONTypes::keyType, JSONTypes::stringType, JSONTypes::v...
-#include "JSONObject.h"
 
 namespace dv {
   namespace json {
@@ -25,6 +24,10 @@ namespace dv {
       JSON() = default;
       JSON( const JSON &other ) = default;
       JSON( JSON &&other ) = default;
+
+      template<typename T> explicit JSON( const T &value ) {
+        *this = value;
+      }
       ~JSON() = default;
 
       JSON &operator=( Type );

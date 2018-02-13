@@ -18,6 +18,9 @@ JSON &JSON::operator[]( const JSON::keyType &key ) {
     value = objectType();
   }
   auto &rt = boost::get<objectType>( value )[key];
+  if ( !rt ) {
+    rt = std::make_shared<JSON>();
+  }
   return *rt;
 }
 

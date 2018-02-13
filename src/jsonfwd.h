@@ -12,6 +12,7 @@
 #include <vector>             // for vector
 #include <sstream>
 #include <type_traits>        // for is_convertible, remove_const, remove_reference
+#include "UnorderedIndexedMap.h"
 
 #ifdef __has_attribute
   #if __has_attribute( pure )
@@ -58,7 +59,6 @@ namespace dv {
     typedef std::shared_ptr<JSONErrorCollector> JSONErrorCollectorPtr;
     class JSONErrorCollectorThrow; // IWYU pragma: keep
     class JSONErrorCollectorImpl; // IWYU pragma: keep
-    class JSONObject;
     template<unsigned N> struct PriorityTag : PriorityTag<N - 1> {};
     template<> struct PriorityTag<0> {};
 
@@ -68,7 +68,7 @@ namespace dv {
       typedef bool boolType;
       typedef double doubleType;
       typedef std::string stringType;
-      typedef JSONObject objectType;
+      typedef UnorderedIndexedMap<std::string, JSONPtr> objectType;
       typedef std::vector<JSONPtr> arrayType;
       typedef stringType keyType;
       typedef boost::variant<nullType, intType, boolType, doubleType, stringType, objectType, arrayType> valueType;

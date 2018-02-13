@@ -13,7 +13,6 @@
 #include "JSONContext.h"
 #include "JSONErrorCollector.h"
 #include "JSONParser.h"
-#include "JSONObject.h"
 // IWYU pragma: end_exports
 
 #endif //DVJSON_JSON_H
