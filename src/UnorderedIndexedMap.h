@@ -65,43 +65,6 @@ namespace dv {
         typedef iteratorTmpl<self::value_type> iterator;
         typedef iteratorTmpl<const self::value_type> const_iterator;
 
-//        static_assert(std::is_const<typename const_iterator::value_type>::value,"bla");
-//        static_assert(std::is_const<typename const_iterator::reference >::value,"bla");
-
-//        typename decltype( *std::declval<const_iterator>() )::X y;
-//        static_assert( std::is_const<decltype( *std::declval<const_iterator>() )>::value, "bla" );
-
-//        typedef typename const_iterator::reference::X y;
-
-        /*class const_iterator {
-         public:
-          typedef const self::value_type value_type;
-          typedef ptrdiff_t difference_type;
-          typedef value_type *pointer;
-          typedef value_type &reference;
-          typedef std::input_iterator_tag iterator_category;
-
-          const_iterator( size_t nIndex, const self &nMap, bool nFind = false ) : index( nIndex ), map( nMap ), find( nFind ) {}
-
-          const_iterator &operator++() {
-            index = map.size() > index ? index + 1 : std::numeric_limits<size_type>::max();
-            return *this;
-          }
-
-          bool operator==( const_iterator other ) const { return index == other.index && &map == &other.map; }
-
-          bool operator!=( const_iterator other ) const { return !( *this == other ); }
-
-          reference operator*() const { return map.values.at( index ); }
-
-          pointer operator->() const { return map.values.at( index ); }
-
-         protected:
-          size_type index;
-          const self &map;
-          bool find;
-        };*/
-
         UnorderedIndexedMap() = default;
         UnorderedIndexedMap( const UnorderedIndexedMap & ) = default;
         UnorderedIndexedMap( UnorderedIndexedMap && ) = default;

@@ -168,6 +168,9 @@ namespace dv {
     }
 
     inline JSONPtr JSON::emplaceBack( const JSONPtr &json ) {
+      if ( value.type() != typeid( arrayType ) ) {
+        value = arrayType();
+      }
       auto &array = boost::get<arrayType>( value );
       array.emplace_back( std::forward<const JSONPtr &>( json ) );
       return *array.rbegin();
