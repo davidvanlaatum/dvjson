@@ -34,8 +34,8 @@ namespace dv {
       JSON &operator=( const JSON &other ) = default;
       JSON &operator=( JSON &&other ) = default;
       template<typename T> inline JSON &operator=( const T &v );
-      JSON &operator[]( const keyType &key ) PURE;
-      JSON &operator[]( indexType index ) PURE;
+      JSON &operator[]( const keyType &key ) JSON_PURE;
+      JSON &operator[]( indexType index ) JSON_PURE;
       bool operator==( const JSON &other ) const;
       bool operator==( Type ) const noexcept;
       bool operator!=( Type ) const noexcept;

@@ -14,7 +14,7 @@ JSONContext::ContextRestore::~ContextRestore() {
 void JSONContext::enter( const std::function<void()> &function ) {
   assert( previous == nullptr );
   assert( currentContext != this );
-  ContextRestore cr UNUSED;
+  ContextRestore cr JSON_UNUSED;
   previous = currentContext;
   currentContext = this;
   function();

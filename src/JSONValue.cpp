@@ -217,7 +217,7 @@ void JSON::dump( std::ostream &os, unsigned int indent ) const {
   dump( os, indent, 1 );
 }
 
-static std::string doIndent( unsigned int indent, unsigned int level ) noexcept PURE;
+static std::string doIndent( unsigned int indent, unsigned int level ) noexcept JSON_PURE;
 
 static std::string doIndent( unsigned int indent, unsigned int level ) noexcept {
   std::string rt;

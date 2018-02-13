@@ -18,14 +18,14 @@ namespace dv {
         ~ContextRestore();
       };
      public:
-      template<class T> inline std::shared_ptr<T> get() PURE;
+      template<class T> inline std::shared_ptr<T> get() JSON_PURE;
       template<class T> inline auto makeDefault( PriorityTag<1> ) const -> decltype( std::make_shared<typename T::defaultContextType>() );
       template<class T> inline std::shared_ptr<T> makeDefault( PriorityTag<0> ) const;
       template<class T> inline void attach( T *, bool takeOwnership = true );
       template<class T> inline void attach( const std::shared_ptr<T> & );
       template<typename T> inline void attach( T & );
       template<typename T> inline void attach( const T & );
-      inline static JSONContext *current() PURE;
+      inline static JSONContext *current() JSON_PURE;
       void enter( const std::function<void()> &function );
       JSONContext::ContextRestore enter();
      protected:

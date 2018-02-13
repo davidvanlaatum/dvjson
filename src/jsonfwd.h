@@ -16,18 +16,18 @@
 
 #ifdef __has_attribute
   #if __has_attribute( pure )
-    #define PURE __attribute__((pure))
+    #define JSON_PURE __attribute__((pure))
   #else
-    #define PURE
+    #define JSON_PURE
   #endif
   #if __has_attribute( unused )
-    #define UNUSED __attribute__((unused))
+    #define JSON_UNUSED __attribute__((unused))
   #else
-    #define UNUSED
+    #define JSON_UNUSED
   #endif
 #else
-  #define PURE
-  #define UNUSED
+  #define JSON_PURE
+  #define JSON_UNUSED
 #endif
 
 namespace dv {
