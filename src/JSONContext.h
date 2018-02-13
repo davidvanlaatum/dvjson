@@ -23,6 +23,7 @@ namespace dv {
       template<class T> inline std::shared_ptr<T> makeDefault( PriorityTag<0> ) const;
       template<class T> inline void attach( T *, bool takeOwnership = true );
       template<class T> inline void attach( const std::shared_ptr<T> & );
+      template<typename T> inline void attach( T & );
       template<typename T> inline void attach( const T & );
       inline static JSONContext *current() PURE;
       void enter( const std::function<void()> &function );
@@ -71,6 +72,11 @@ namespace dv {
       } else {
         items[&typeid( T )] = std::shared_ptr<T>( obj, NullDeleter<T>() );
       }
+    }
+
+    template<typename T>
+    void JSONContext::attach( T &obj ) {
+      attach( &obj, false );
     }
 
     template<typename T>
