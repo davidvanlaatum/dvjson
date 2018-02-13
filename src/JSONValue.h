@@ -20,7 +20,7 @@ namespace dv {
     class JSONDiffListener;
     class JSONPath;
     class JSON : public std::enable_shared_from_this<JSON>, public JSONTypes {
-     public:
+    public:
       JSON() = default;
       JSON( const JSON &other ) = default;
       JSON( JSON &&other ) = default;
@@ -28,6 +28,7 @@ namespace dv {
       template<typename T> explicit JSON( const T &value ) {
         *this = value;
       }
+
       ~JSON() = default;
 
       JSON &operator=( Type );
@@ -55,7 +56,7 @@ namespace dv {
       inline JSONPtr emplaceBack( const JSONPtr &json );
       inline size_t size() const noexcept;
       class ArrayIterator {
-       public:
+      public:
         explicit ArrayIterator( const arrayType *nArray ) : array( nArray ) {}
 
         typedef arrayType::iterator iterator;
@@ -65,13 +66,13 @@ namespace dv {
 
         inline const_iterator end() const { return array->end(); }
 
-       private:
+      private:
         const arrayType *array;
       };
       inline const ArrayIterator arrayIterator() const noexcept;
 
       class ObjectIterator {
-       public:
+      public:
         explicit ObjectIterator( const objectType *nObject ) : object( nObject ) {}
 
         typedef objectType::iterator iterator;
@@ -81,11 +82,11 @@ namespace dv {
 
         inline const_iterator end() const { return object->end(); }
 
-       private:
+      private:
         const objectType *object;
       };
       inline const ObjectIterator objectIterator() const noexcept;
-     protected:
+    protected:
       valueType value;
       void dump( std::ostream &os, unsigned int indent, unsigned int level ) const;
       void writeEscaped( std::ostream &os, const stringType &v ) const;
@@ -139,7 +140,7 @@ namespace dv {
           return call( value, PriorityTag<3>() );
         }
 
-       private:
+      private:
         const JSON *j;
         typename JSONConstructor<Wanted>::constructType *ret{ nullptr };
       };
@@ -171,6 +172,7 @@ namespace dv {
       if ( value.type() != typeid( arrayType ) ) {
         value = arrayType();
       }
+      assert( json );
       auto &array = boost::get<arrayType>( value );
       array.emplace_back( std::forward<const JSONPtr &>( json ) );
       return *array.rbegin();

@@ -72,6 +72,13 @@ namespace dv {
         -> decltype( call( j, std::forward<T>( val ), path, PriorityTag<10> {} ) ) {
           return call( j, std::forward<T>( val ), path, PriorityTag<10> {} );
         }
+
+        template<typename JsonType, typename T>
+        auto operator()( JsonType &j, T &val, const JSONPath &path ) const
+        noexcept( noexcept( std::declval<to_json_function>().call( j, val, path, PriorityTag<10> {} ) ) )
+        -> decltype( call( j, val, path, PriorityTag<10> {} ) ) {
+          return call( j, val, path, PriorityTag<10> {} );
+        }
       };
 
       struct from_json_function {
@@ -82,7 +89,7 @@ namespace dv {
 
           template<typename JsonType, typename Current, typename Other=O>
           auto call( const JsonType &, Current &, Other &&other, PriorityTag<3> ) const
-          -> decltype( from_json( std::declval<JSON &>(), other, std::declval<JSONPath &>() ), void() ) {
+          -> decltype( from_json( std::declval<const JSON &>(), other, std::declval<JSONPath &>() ), void() ) {
             from_json( j, other, path );
           }
 
@@ -273,8 +280,8 @@ namespace dv {
         template<typename JsonType, typename ValueType>
         static auto
         from_json( JsonType &&j, ValueType &val )
-        noexcept( noexcept( ::dv::json::from_json( std::forward<JsonType>( j ), val, std::declval<JSONPath &>() ) ) )
-        -> decltype( ::dv::json::from_json( std::forward<JsonType>( j ), val, std::declval<JSONPath &>() ) ) {
+        noexcept( noexcept( ::dv::json::from_json( std::forward<JsonType>( j ), val, std::declval<const JSONPath &>() ) ) )
+        -> decltype( ::dv::json::from_json( std::forward<JsonType>( j ), val, std::declval<const JSONPath &>() ) ) {
           JSONContext context;
           auto cr = context.enter();
           auto path = context.get<JSONPath>();
@@ -296,8 +303,8 @@ namespace dv {
         template<typename JsonType, typename ValueType>
         static auto
         to_json( JsonType &j, ValueType &&val, const JSONErrorCollectorPtr &collector )
-        noexcept( noexcept( ::dv::json::to_json( j, std::forward<ValueType>( val ), std::declval<JSONPath &>() ) ) )
-        -> decltype( ::dv::json::to_json( j, std::forward<ValueType>( val ), std::declval<JSONPath &>() ) ) {
+        noexcept( noexcept( ::dv::json::to_json( j, std::forward<ValueType>( val ), std::declval<const JSONPath &>() ) ) )
+        -> decltype( ::dv::json::to_json( j, std::forward<ValueType>( val ), std::declval<const JSONPath &>() ) ) {
           JSONContext context;
           context.attach( collector );
           auto cr = context.enter();
@@ -319,8 +326,8 @@ namespace dv {
         template<typename JsonType, typename ValueType>
         static auto
         to_json( JsonType &j, ValueType &&val )
-        noexcept( noexcept( ::dv::json::to_json( j, std::forward<ValueType>( val ), std::declval<JSONPath &>() ) ) )
-        -> decltype( ::dv::json::to_json( j, std::forward<ValueType>( val ), std::declval<JSONPath &>() ) ) {
+        noexcept( noexcept( ::dv::json::to_json( j, std::forward<ValueType>( val ), std::declval<const JSONPath &>() ) ) )
+        -> decltype( ::dv::json::to_json( j, std::forward<ValueType>( val ), std::declval<const JSONPath &>() ) ) {
           JSONContext context;
           auto cr = context.enter();
           auto path = context.get<JSONPath>();
@@ -339,7 +346,7 @@ namespace dv {
 
         template<typename JsonType, typename ValueType>
         static bool compare( JsonType &j, ValueType &&val, const JSONErrorCollectorPtr &collector )
-        noexcept( noexcept( ::dv::json::json_compare( j, std::forward<ValueType>( val ), std::declval<JSONPath &>() ) ) ) {
+        noexcept( noexcept( ::dv::json::json_compare( j, std::forward<ValueType>( val ), std::declval<const JSONPath &>() ) ) ) {
           JSONContext context;
           context.attach( collector );
           auto cr = context.enter();
@@ -358,7 +365,7 @@ namespace dv {
 
         template<typename JsonType, typename ValueType>
         static bool compare( JsonType &j, ValueType &&val )
-        noexcept( noexcept( ::dv::json::json_compare( j, std::forward<ValueType>( val ), std::declval<JSONPath &>() ) ) ) {
+        noexcept( noexcept( ::dv::json::json_compare( j, std::forward<ValueType>( val ), std::declval<const JSONPath &>() ) ) ) {
           JSONContext context;
           auto cr = context.enter();
           auto path = context.get<JSONPath>();
