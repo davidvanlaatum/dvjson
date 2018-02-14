@@ -25,9 +25,7 @@ namespace dv {
       JSON( const JSON &other ) = default;
       JSON( JSON &&other ) = default;
 
-      template<typename T> explicit JSON( const T &value ) {
-        *this = value;
-      }
+      template<typename T> explicit JSON( const T &v ) { *this = v; }
 
       ~JSON() = default;
 

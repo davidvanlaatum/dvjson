@@ -144,6 +144,6 @@ namespace dv {
         indexType index;
       };
   }
-};
+}
 
 #endif //DVFORMSCPP_UNORDEREDINDEXEDMAP_H
