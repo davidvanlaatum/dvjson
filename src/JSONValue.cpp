@@ -143,6 +143,7 @@ bool JSON::compare( const JSON &other, JSONDiffListener &listener, const JSONPat
         auto it2 = arr2.begin();
         size_t index1 = 0;
         size_t index2 = 0;
+        rt = true;
         while ( it1 != arr1.end() && it2 != arr2.end() ) {
           if ( !( *it1 )->compare( **it2, listener, path[index1] ) ) {
             rt = false;
@@ -328,6 +329,12 @@ bool JSON::operator==( Type t ) const noexcept {
 
 bool JSON::operator!=( Type t ) const noexcept {
   return type() != t;
+}
+
+std::string JSON::toString() const {
+  std::ostringstream str;
+  str << *this;
+  return str.str();
 }
 
 std::ostream &dv::json::operator<<( std::ostream &os, Type type ) {

@@ -168,9 +168,9 @@ void JSONParser::parseInto( JSON &value, std::istream &stream ) {
           case ARRAY:
             if ( c == '[' ) {
               *stackptr->node = Type::ARRAY;
-              stackptr = stack.push( stackptr->node->emplaceBack( std::make_shared<JSON>() ) );
+              stackptr = stack.push( stackptr->node->emplaceBack() );
             } else if ( c == ',' ) {
-              stackptr = stack.push( stackptr->node->emplaceBack( std::make_shared<JSON>() ) );
+              stackptr = stack.push( stackptr->node->emplaceBack() );
             } else if ( c == ']' ) {
               stackptr = stack.pop();
             } else if ( !isspace( c ) ) {

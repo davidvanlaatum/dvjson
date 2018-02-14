@@ -54,7 +54,9 @@ namespace dv {
       void dump( std::ostream &os, unsigned int indent = 0 ) const;
 
       inline JSONPtr emplaceBack( const JSONPtr &json );
+      template<typename... T> inline JSONPtr emplaceBack( T &&... );
       inline size_t size() const noexcept;
+      std::string toString() const;
       class ArrayIterator {
       public:
         explicit ArrayIterator( const arrayType *nArray ) : array( nArray ) {}
@@ -175,6 +177,15 @@ namespace dv {
       assert( json );
       auto &array = boost::get<arrayType>( value );
       array.emplace_back( std::forward<const JSONPtr &>( json ) );
+      return *array.rbegin();
+    }
+
+    template<typename... T> inline JSONPtr JSON::emplaceBack( T &&...x ) {
+      if ( value.type() != typeid( arrayType ) ) {
+        value = arrayType();
+      }
+      auto &array = boost::get<arrayType>( value );
+      array.emplace_back( std::make_shared<JSON>( std::forward<T>( x )... ) );
       return *array.rbegin();
     }
 

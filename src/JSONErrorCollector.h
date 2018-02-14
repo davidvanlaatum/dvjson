@@ -11,24 +11,26 @@ namespace dv {
     class JSONPath;
     class JSONErrorCollectorThrow;
     class JSONErrorCollector {
-     public:
+    public:
       virtual ~JSONErrorCollector();
       virtual void error( const JSONPath &path, const std::string &message ) = 0;
       typedef JSONErrorCollectorThrow defaultContextType;
     };
 
     class JSONErrorCollectorThrow : public JSONErrorCollector {
-     public:
+    public:
       ~JSONErrorCollectorThrow() override;
       void error( const JSONPath &path, const std::string &message ) override;
     };
 
     class JSONErrorCollectorImpl : public JSONErrorCollector {
-     public:
+    public:
       ~JSONErrorCollectorImpl() override;
       void error( const JSONPath &path, const std::string &message ) override;
+      bool empty() const;
+      const std::list<std::string> &getMessages() const;
 
-     protected:
+    protected:
       std::list<std::string> messages;
     };
   }

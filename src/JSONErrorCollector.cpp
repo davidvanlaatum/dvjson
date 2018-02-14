@@ -17,3 +17,11 @@ JSONErrorCollectorImpl::~JSONErrorCollectorImpl() = default;
 void JSONErrorCollectorImpl::error( const JSONPath &path, const std::string &message ) {
   messages.emplace_back( path.toString() + ": " + message );
 }
+
+bool JSONErrorCollectorImpl::empty() const {
+  return messages.empty();
+}
+
+const std::list<std::string> &JSONErrorCollectorImpl::getMessages() const {
+  return messages;
+}
