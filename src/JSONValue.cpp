@@ -136,8 +136,39 @@ bool JSON::compare( const JSON &other, JSONDiffListener &listener, const JSONPat
         }
         break;
       }
-      case Type::ARRAY:
+      case Type::ARRAY: {
+        auto arr1 = boost::get<arrayType>( value );
+        auto arr2 = boost::get<arrayType>( other.value );
+        auto it1 = arr1.begin();
+        auto it2 = arr2.begin();
+        size_t index1 = 0;
+        size_t index2 = 0;
+        while ( it1 != arr1.end() && it2 != arr2.end() ) {
+          if ( !( *it1 )->compare( **it2, listener, path[index1] ) ) {
+            rt = false;
+          }
+          ++it1;
+          index1++;
+          ++it2;
+          index2++;
+        }
+        if ( it1 != arr1.end() || it2 != arr2.end() ) {
+          rt = false;
+          if ( listener.isInterested() ) {
+            while ( it1 != arr1.end() ) {
+              listener.recordDifference( path[index1], "Missing from right" );
+              ++it1;
+              index1++;
+            }
+            while ( it2 != arr2.end() ) {
+              listener.recordDifference( path[index2], "Missing from left" );
+              ++it2;
+              index2++;
+            }
+          }
+        }
         break;
+      }
     }
   } else if ( listener.isInterested() ) {
     std::ostringstream msg;
@@ -153,7 +184,7 @@ bool JSON::operator==( const JSON &other ) const {
 }
 
 class JSONTypeVisitor : public boost::static_visitor<Type> {
- public:
+public:
 #define TYPE( t, T ) Type operator()( const t & ) { return Type::T; }
 
   TYPE( JSON::nullType, NULLVALUE )
