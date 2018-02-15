@@ -235,6 +235,16 @@ JSON &JSON::operator=( Type v ) {
   return *this;
 }
 
+JSON &JSON::operator=( const JSON &other ) {
+  value = other.value;
+  return *this;
+}
+
+JSON &JSON::operator=( JSON &&other ) {
+  value = std::move( other.value );
+  return *this;
+}
+
 void JSON::writeEscaped( std::ostream &os, const JSON::stringType &v ) const {
   for ( auto item : v ) {
     if ( item == '"' ) {

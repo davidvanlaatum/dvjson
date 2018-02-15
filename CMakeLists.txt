@@ -1,8 +1,15 @@
 list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" )
 cmake_minimum_required ( VERSION 3.6 )
 
-find_program ( CLANG clang HINTS /opt/local/bin )
-find_program ( CLANGPP clang++ HINTS /opt/local/bin )
+foreach ( MAJOR RANGE 10 3 -1 )
+  foreach ( MINOR RANGE 10 0 -1 )
+    list ( APPEND CLANG_ALIASES clang-${MAJOR}.${MINOR} )
+    list ( APPEND CLANGPP_ALIASES clang++-${MAJOR}.${MINOR} )
+  endforeach ()
+endforeach ()
+
+find_program ( CLANG NAMES clang ${CLANG_ALIASES} HINTS /opt/local/bin )
+find_program ( CLANGPP NAMES clang++ ${CLANGPP_ALIASES} HINTS /opt/local/bin )
 set ( CXX $ENV{CXX} )
 set ( CC $ENV{CC} )
 if ( CLANG AND CLANGPP AND ( NOT CC ) AND ( NOT CXX ) AND NOT CMAKE_CXX_COMPILER AND NOT CMAKE_C_COMPILER )

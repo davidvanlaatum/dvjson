@@ -15,7 +15,7 @@
 #include <type_traits>              // for declval, enable_if, is_floating_point, remove_reference, remove_const, is_convertible, is_integral, is_same
 #include <typeinfo>                 // for type_info
 
-#define DISABLE_JSON_MISSING_FUNC
+//#define DISABLE_JSON_MISSING_FUNC
 
 namespace dv {
   namespace json {
@@ -71,13 +71,6 @@ namespace dv {
         noexcept( noexcept( std::declval<to_json_function>().call( j, std::forward<T>( val ), path, PriorityTag<10> {} ) ) )
         -> decltype( call( j, std::forward<T>( val ), path, PriorityTag<10> {} ) ) {
           return call( j, std::forward<T>( val ), path, PriorityTag<10> {} );
-        }
-
-        template<typename JsonType, typename T>
-        auto operator()( JsonType &j, T &val, const JSONPath &path ) const
-        noexcept( noexcept( std::declval<to_json_function>().call( j, val, path, PriorityTag<10> {} ) ) )
-        -> decltype( call( j, val, path, PriorityTag<10> {} ) ) {
-          return call( j, val, path, PriorityTag<10> {} );
         }
       };
 

@@ -30,8 +30,8 @@ namespace dv {
       ~JSON() = default;
 
       JSON &operator=( Type );
-      JSON &operator=( const JSON &other ) = default;
-      JSON &operator=( JSON &&other ) = default;
+      JSON &operator=( const JSON &other );
+      JSON &operator=( JSON &&other );
       template<typename T> inline JSON &operator=( const T &v );
       JSON &operator[]( const keyType &key ) JSON_PURE;
       JSON &operator[]( indexType index ) JSON_PURE;
