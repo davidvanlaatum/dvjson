@@ -229,9 +229,9 @@ void JSONParser::parseInto( JSON &value, std::istream &stream ) {
     if ( stackptr && stackptr->hasContext() ) {
       msg << stackptr->buffer;
     }
-    char buffer[129] = { 0 };
-    if ( stream.readsome( buffer, sizeof( buffer ) - 1 ) > 0 ) {
-      msg << buffer;
+    std::vector<char> buffer( 129 );
+    if ( stream.readsome( buffer.data(), static_cast<std::streamsize>(buffer.size() - 1) ) > 0 ) {
+      msg << buffer.data();
     }
     msg << "'";
     throw JSONParseException( msg.str() );
