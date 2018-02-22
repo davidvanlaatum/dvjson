@@ -2,18 +2,24 @@
 #include "JSONDiffListener.h"  // for JSONDiffListener, JSONDiffNullListener
 #include "JSONPath.h"          // for JSONPath
 #include "JSONConverters.h"
+#include "JSONException.h"
+#include "JSONParser.h"
 #include <set>
 #include <sstream>
 #include <string>              // for string
 
 using namespace dv::json;
 
-std::ostream &dv::json::operator<<( std::ostream &os, const JSON &json ) {
+void detail::writeJSON( std::ostream &os, const JSON &json ) {
   json.dump( os, 2 );
-  return os;
 }
 
-JSON &JSON::operator[]( const JSON::keyType &key ) {
+void detail::readJSON( std::istream &is, JSON &json ) {
+  JSONParser parser;
+  parser.parseInto( json, is );
+}
+
+JSON::reference JSON::operator[]( const JSON::keyType &key ) {
   if ( value.type() != typeid( objectType ) ) {
     value = objectType();
   }
@@ -24,7 +30,18 @@ JSON &JSON::operator[]( const JSON::keyType &key ) {
   return *rt;
 }
 
-JSON &JSON::operator[]( JSON::indexType index ) {
+JSON::const_reference JSON::operator[]( const JSON::keyType &key ) const {
+  if ( value.type() != typeid( objectType ) ) {
+    throw JSONWrongTypeException( typeid( objectType ), value.type() );
+  }
+  auto &rt = boost::get<objectType>( value )[key];
+  if ( !rt ) {
+    throw JSONNoSuchKeyException( key );
+  }
+  return *rt;
+}
+
+JSON::reference JSON::operator[]( JSON::indexType index ) {
   if ( value.type() != typeid( arrayType ) ) {
     value = arrayType();
   }
@@ -37,6 +54,17 @@ JSON &JSON::operator[]( JSON::indexType index ) {
     vector[index] = rt = std::make_shared<JSON>();
   }
   return *rt;
+}
+
+JSON::const_reference JSON::operator[]( JSON::indexType index ) const {
+  if ( value.type() != typeid( objectType ) ) {
+    throw JSONWrongTypeException( typeid( objectType ), value.type() );
+  }
+  auto &vector = boost::get<arrayType>( value );
+  if ( vector.size() < index ) {
+    throw JSONNoSuchKeyException( index );
+  }
+  return *vector[index];
 }
 
 bool JSON::compare( const JSON &other, JSONDiffListener &listener ) const {
@@ -184,6 +212,11 @@ bool JSON::operator==( const JSON &other ) const {
   return compare( other, listener );
 }
 
+bool JSON::operator!=( const JSON &other ) const {
+  JSONDiffNullListener listener;
+  return !compare( other, listener );
+}
+
 class JSONTypeVisitor : public boost::static_visitor<Type> {
 public:
 #define TYPE( t, T ) Type operator()( const t & ) { return Type::T; }
@@ -214,10 +247,10 @@ JSON &JSON::operator=( Type v ) {
       *this = arrayType();
       break;
     case Type::DOUBLE:
-      *this = 0.0;
+      *this = static_cast<doubleType>(0.0);
       break;
     case Type::INT:
-      *this = 0;
+      *this = static_cast<intType>(0);
       break;
     case Type::NULLVALUE:
       *this = nullptr;

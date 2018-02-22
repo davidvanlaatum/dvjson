@@ -125,6 +125,15 @@ namespace dv {
           }
         }
 
+        inline const mapped_type &operator[]( const key_type &key ) const {
+          const auto &it = index.find( key );
+          if ( it == index.end() ) {
+            throw std::runtime_error( "key " + key + " does not exist in constant " + typeid( self ).name() );
+          } else {
+            return values[it->second].second;
+          }
+        }
+
         template<class... Args> iterator emplace( const Key &key, Args &&... args ) {
           size_type i;
           const auto &it = index.find( key );

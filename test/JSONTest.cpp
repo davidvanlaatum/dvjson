@@ -92,3 +92,10 @@ TEST_F( JSONTest, Compare ) {
   EXPECT_EQ( "$: 1 != 2\n", listener.toString() );
   listener.clear();
 }
+
+TEST_F( JSONTest, Construct ) {
+  EXPECT_EQ( JSON( { true } ), Type::ARRAY );
+  EXPECT_EQ( JSON( { true, 1 } ), Type::ARRAY );
+  EXPECT_EQ( JSON( "hi all" ), Type::STRING );
+  EXPECT_EQ( JSON( { std::make_pair( "hi", 123 ), std::make_pair( "bye", 342.0 ) } ), Type::OBJECT );
+}

@@ -14,6 +14,7 @@
 #include <vector>             // for vector
 #include <assert.h>           // for assert
 #include <stddef.h>           // for size_t
+#include <boost/type_traits.hpp>
 
 namespace dv {
   namespace json {
@@ -111,6 +112,26 @@ namespace dv {
       }
 
       return rt;
+    }
+
+    template<typename T>
+    inline void to_json( JSON &json, const std::vector<T> &value, const JSONPath &path ) {
+      json = Type::ARRAY;
+      size_t i = 0;
+      for ( const auto &item : value ) {
+        JSONSerialiser<T>::to_json( json[i], item, path[i] );
+        i++;
+      }
+    }
+
+    template<typename T>
+    inline void from_json( const JSON &json, std::vector<T> &value, const JSONPath &path ) {
+      value.resize( json.size() );
+      size_t i = 0;
+      for ( const auto &item : json.arrayIterator() ) {
+        JSONSerialiser<T>::from_json( *item, value[i], path[i] );
+        i++;
+      }
     }
 
     template<typename T, typename std::enable_if<std::is_base_of<std::enable_shared_from_this<T>, T>::value, int>::type = 0>

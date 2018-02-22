@@ -36,24 +36,34 @@ namespace dv {
         }
 
         template<typename JsonType, typename T>
-        auto call( JsonType &j, std::shared_ptr<T> &&val, const JSONPath &path, PriorityTag<2> ) const
+        auto call( JsonType &j, std::shared_ptr<T> &&val, const JSONPath &path, PriorityTag<5> ) const
         noexcept( noexcept( to_json( j, std::forward<std::shared_ptr<T >>( val ), path ) ) )
         -> decltype( to_json( j, std::forward<std::shared_ptr<T >>( val ), path ), void() ) {
+          static_assert( has_to_json<T>::value, "has_to_json returned false" );
           return to_json( j, std::forward<std::shared_ptr<T >>( val ), path );
         }
 
         template<typename JsonType, typename T>
-        auto call( JsonType &j, std::weak_ptr<T> &&val, const JSONPath &path, PriorityTag<2> ) const
+        auto call( JsonType &j, std::weak_ptr<T> &&val, const JSONPath &path, PriorityTag<4> ) const
         noexcept( noexcept( to_json( j, std::forward<std::weak_ptr<T >>( val ), path ) ) )
         -> decltype( to_json( j, std::forward<std::weak_ptr<T >>( val ), path ), void() ) {
+          static_assert( has_to_json<T>::value, "has_to_json returned false" );
           return to_json( j, std::forward<std::weak_ptr<T >>( val ), path );
         }
 
         template<typename JsonType, typename T>
-        auto call( JsonType &j, T &&val, const JSONPath &path, PriorityTag<1> ) const
+        auto call( JsonType &j, T &&val, const JSONPath &path, PriorityTag<3> ) const
         noexcept( noexcept( to_json( j, std::forward<T>( val ), path ) ) )
         -> decltype( to_json( j, std::forward<T>( val ), path ), void() ) {
+          static_assert( has_to_json<T>::value, "has_to_json returned false" );
           return to_json( j, std::forward<T>( val ), path );
+        }
+
+        template<typename JsonType, typename T, typename std::enable_if<is_streamable_object<T>::value, int>::type = 0>
+        void call( JsonType &j, T &&val, const JSONPath &/*path*/, PriorityTag<2> ) const {
+          std::ostringstream stream;
+          stream << val;
+          j = stream.str();
         }
 
 #ifndef DISABLE_JSON_MISSING_FUNC
@@ -374,6 +384,9 @@ namespace dv {
           return ::dv::json::json_construct( static_cast<JSON *>(nullptr), val );
         }
       };
+
+    template<typename T> struct JSONConstructor<T &> : public JSONConstructor<T> {};
+    template<typename T> struct JSONConstructor<const T> : public JSONConstructor<T> {};
   }
 }
 #endif //DVJSON_JSONSERIALISER_H

@@ -2,8 +2,9 @@
 #ifndef DVJSON_JSONVALUEFWD_H
 #define DVJSON_JSONVALUEFWD_H
 
-#include <stddef.h>           // for size_t
 #include <boost/variant.hpp>  // for variant
+#include <boost/type_traits.hpp>
+#include <cstddef>            // for size_t
 #include <cstdint>            // for int64_t
 #include <iosfwd>             // for ostream, nullptr_t
 #include <memory>             // for shared_ptr
@@ -59,6 +60,8 @@ namespace dv {
     typedef std::shared_ptr<JSONErrorCollector> JSONErrorCollectorPtr;
     class JSONErrorCollectorThrow; // IWYU pragma: keep
     class JSONErrorCollectorImpl; // IWYU pragma: keep
+    class JSONException;
+    class JSONParseException;
     template<unsigned N> struct PriorityTag : PriorityTag<N - 1> {};
     template<> struct PriorityTag<0> {};
 
@@ -75,20 +78,10 @@ namespace dv {
       typedef size_t indexType;
     };
 
-    std::ostream &operator<<( std::ostream &os, const JSON &json );
-    std::ostream &operator<<( std::ostream &os, const JSONDiffListenerImpl &listener );
-
-    template<typename T>
-    inline bool operator==( T &&v, const JSON &j ) {
-      return j == v;
-    }
-
-    template<typename T>
-    inline bool operator!=( T &&v, const JSON &j ) {
-      return j != v;
-    }
-
     namespace detail {
+      template<bool B> using enable_if_t = typename std::enable_if<B, int>::type;
+      template<typename T> using uncvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+
       template<typename X, typename Y>
         struct variant_has_type {
          private:
@@ -108,10 +101,8 @@ namespace dv {
               static const bool value = false;
             };
          public:
-          static const bool value = has_type<typename std::remove_reference<typename std::remove_const<X>::type>::type, Y>::value;
+          static const bool value = has_type<uncvref_t<X>, uncvref_t<Y>>::value;
         };
-      template<typename X, typename Y> struct variant_has_type<const X, Y> : public variant_has_type<X, Y> {};
-      template<typename X, typename Y> struct variant_has_type<X &, Y> : public variant_has_type<X, Y> {};
 
       template<typename X, typename Y>
         struct variant_is_convertible {
@@ -129,10 +120,90 @@ namespace dv {
               static const bool value = false;
             };
          public:
-          static const bool value = is_convertible<X, Y>::value;
+          static const bool value = not std::is_same<uncvref_t<X>, Y>::value and is_convertible<uncvref_t<X>, Y>::value;
         };
-      template<typename X, typename Y> struct variant_is_convertible<const X, Y> : public variant_is_convertible<X, Y> {};
+
+      template<typename Y, typename Z=uncvref_t<Y>> struct is_streamable_object_sub {
+       private:
+        template<typename T> struct has_left {
+          template<typename X>
+          static auto check( X * ) -> decltype( std::declval<std::ostream &>() << std::declval<X &>(), std::true_type() );
+          template<typename> static constexpr std::false_type check( ... );
+          typedef decltype( check<T>( nullptr ) ) type;
+          static const bool value = type::value;
+        };
+        template<typename T> struct has_right {
+          template<typename X>
+          static auto check( X * ) -> decltype( std::declval<std::istream>() >> std::declval<X>(), std::true_type() );
+          template<typename> static constexpr std::false_type check( ... );
+          typedef decltype( check<T>( nullptr ) ) type;
+          static const bool value = type::value;
+        };
+       public:
+        static const bool value = not std::is_fundamental<Z>::value and
+                                  std::is_object<Z>::value and
+                                  has_left<Z>::value and
+                                  has_right<Z>::value;
+      };
+      template<> struct is_streamable_object_sub<std::nullptr_t> { static const bool value = false; };
+
+      template<typename T, typename X=uncvref_t<T>>
+        struct is_streamable_object : public std::conditional<is_streamable_object_sub<X>::value, std::true_type, std::false_type>::type {};
+
+      template<typename T>
+        struct has_to_json {
+         private:
+          template<typename X, typename JSONType=JSON>
+          static auto check( X * )
+          -> decltype( to_json( std::declval<JSONType &>(), std::forward<X>( std::declval<X>() ), std::declval<JSONPath &>() ), std::true_type() );
+          template<typename> static constexpr std::false_type check( ... );
+          typedef decltype( check<uncvref_t<T>>( 0 ) ) type;
+         public:
+          static const bool value = type::value;
+        };
+
+      template<typename T>
+        struct supports_implicit_to_json {
+          static const bool value =
+            has_to_json<T>::value or
+            variant_has_type<T, JSONTypes::valueType>::value or
+            variant_is_convertible<T, JSONTypes::valueType>::value or
+            is_streamable_object<T>::value;
+        };
+
+      template<typename T, typename X=uncvref_t<T>>
+        struct supports_implicit_json_compare {
+          static const bool value =
+            not std::is_same<X, JSON>::value and
+            not std::is_same<X, JSONPtr>::value;
+        };
+
+      void writeJSON( std::ostream &os, const JSON &json );
+      void readJSON( std::istream &is, JSON &json );
     }
+
+    template<typename T, typename JSONType=JSON, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value && std::is_same<T, JSONType>::value> = 0>
+    inline bool operator==( T &&v, const JSONType &j ) {
+      return j == v;
+    }
+
+    template<typename T, typename JSONType=JSON, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value && std::is_same<T, JSONType>::value> = 0>
+    inline bool operator!=( T &&v, const JSONType &j ) {
+      return j != v;
+    }
+
+    template<typename T, typename X=detail::uncvref_t<T>, detail::enable_if_t<std::is_same<X, JSON>::value> = 0>
+    inline std::ostream &operator<<( std::ostream &os, T &json ) {
+      detail::writeJSON( os, json );
+      return os;
+    };
+    std::ostream &operator<<( std::ostream &os, const JSONDiffListenerImpl &listener );
+
+    template<typename T, typename X=detail::uncvref_t<T>, detail::enable_if_t<std::is_same<X, JSON>::value> = 0>
+    inline std::istream &operator>>( std::istream &is, T &json ) {
+      readJSON( is, json );
+      return is;
+    };
   }
 }
 

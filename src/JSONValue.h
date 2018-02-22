@@ -25,7 +25,22 @@ namespace dv {
       JSON( const JSON &other ) = default;
       JSON( JSON &&other ) = default;
 
-      template<typename T> explicit JSON( const T &v ) { *this = v; }
+      template<typename T, detail::enable_if_t<detail::supports_implicit_to_json<T>::value> = 0>
+      JSON( T &&v ) { *this = v; }
+
+      JSON( std::initializer_list<JSON> v ) {
+        *this = Type::ARRAY;
+        for ( auto &item : v ) {
+          emplaceBack( item );
+        }
+      }
+
+      JSON( std::initializer_list<std::pair<keyType, JSON>> v ) {
+        *this = Type::OBJECT;
+        for ( auto &item : v ) {
+          ( *this )[item.first] = item.second;
+        }
+      }
 
       ~JSON() = default;
 
@@ -33,14 +48,28 @@ namespace dv {
       JSON &operator=( const JSON &other );
       JSON &operator=( JSON &&other );
       template<typename T> inline JSON &operator=( const T &v );
-      JSON &operator[]( const keyType &key ) JSON_PURE;
-      JSON &operator[]( indexType index ) JSON_PURE;
+      typedef JSON &reference;
+      typedef const JSON &const_reference;
+      reference operator[]( const keyType &key ) JSON_PURE;
+
+      inline reference operator[]( const char *key ) JSON_PURE { return ( *this )[keyType( key )]; }
+
+      reference operator[]( indexType index ) JSON_PURE;
+      const_reference operator[]( const keyType &key ) const JSON_PURE;
+
+      inline const_reference operator[]( const char *key ) const JSON_PURE { return ( *this )[keyType( key )]; }
+
+      const_reference operator[]( indexType index ) const JSON_PURE;
       bool operator==( const JSON &other ) const;
+      bool operator!=( const JSON &other ) const;
       bool operator==( Type ) const noexcept;
       bool operator!=( Type ) const noexcept;
-      template<typename T> inline bool operator!=( const T &v ) const;
-      template<typename T> inline bool operator==( const T &v ) const;
-      template<typename T> inline explicit operator T() const noexcept;
+      template<typename T, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value> = 0> inline bool operator!=( const T &v ) const;
+      template<typename T, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value> = 0> inline bool operator==( const T &v ) const;
+
+      template<typename T, typename std::enable_if<not std::is_same<std::string::value_type, T>::value and
+                                                   not std::is_pointer<T>::value, int>::type = 0>
+      inline operator T() const noexcept { return as<T>(); }
       template<typename T> inline typename JSONConstructor<T>::constructType as() const;
       template<typename T> inline typename JSONConstructor<T>::constructType as( typename JSONConstructor<T>::constructType & ) const;
       template<typename T> inline bool is() const;
@@ -104,6 +133,12 @@ namespace dv {
         get_json_value_visitor( const JSON *pj, typename JSONConstructor<Wanted>::constructType *pRet ) : j( pj ), ret( pRet ) {}
 
         template<typename Actual, typename LRet=Ret>
+        auto call( Actual &value, const PriorityTag<4> & )
+        -> decltype( json_as( std::declval<const Actual &>(), std::declval<JSON &>(), std::declval<LRet *>() ), LRet() ) {
+          return json_as( value, *j, static_cast<LRet *>(nullptr) );
+        }
+
+        template<typename Actual, typename LRet=Ret>
         LRet call( Actual &value, const PriorityTag<3> &, typename std::enable_if<std::is_same<LRet, Actual>::value, int>::type = 0 ) {
           if ( ret ) {
             *ret = value;
@@ -126,24 +161,32 @@ namespace dv {
 
         template<typename Actual, typename LRet=Ret, typename W=Wanted, typename std::enable_if<!std::is_same<float, W>::value, int>::type = 0>
         LRet call( Actual &/*value*/, const PriorityTag<0> & ) {
-          typename JSONConstructor<Wanted>::constructType v;
+          LRet v;
           if ( ret ) {
             v = *ret;
           } else {
-            v = JSONConstructor<Wanted>::construct( static_cast<Wanted *>(nullptr) );
+            v = JSONConstructor<Wanted>::construct( static_cast<typename std::remove_cv<typename std::remove_reference<Wanted>::type>::type *>(nullptr) );
           }
           JSONSerialiser<Wanted>::from_json( *j, v );
           return v;
         }
 
         template<typename X=Wanted> Ret operator()( X &value ) {
-          return call( value, PriorityTag<3>() );
+          return call( value, PriorityTag<4>() );
         }
 
       private:
         const JSON *j;
-        typename JSONConstructor<Wanted>::constructType *ret{ nullptr };
+        Ret *ret{ nullptr };
       };
+    }
+
+    template<typename T> inline JSON &json_as( T &, JSON &j, JSON * ) {
+      return j;
+    }
+
+    template<typename T> inline const JSON &json_as( T &, const JSON &j, JSON * ) {
+      return j;
     }
 
     template<typename T>
@@ -161,11 +204,6 @@ namespace dv {
     template<typename T> inline bool JSON::is() const {
       static_assert( detail::variant_has_type<T, JSON::valueType>::value, "Must be one of the internal types" );
       return value.type() == typeid( T );
-    }
-
-    template<typename T> JSON::operator T() const noexcept {
-      detail::get_json_value_visitor<T> visitor( this );
-      return value.apply_visitor( visitor );
     }
 
     inline JSONPtr JSON::emplaceBack( const JSONPtr &json ) {
@@ -220,11 +258,11 @@ namespace dv {
       return *this;
     }
 
-    template<typename T> bool JSON::operator==( const T &v ) const {
+    template<typename T, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value>> bool JSON::operator==( const T &v ) const {
       return JSONSerialiser<T>::compare( *this, v );
     }
 
-    template<typename T> bool JSON::operator!=( const T &v ) const {
+    template<typename T, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value>> bool JSON::operator!=( const T &v ) const {
       return !JSONSerialiser<T>::compare( *this, v );
     }
   }

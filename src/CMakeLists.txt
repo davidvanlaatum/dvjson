@@ -10,7 +10,11 @@ add_library ( dvjson SHARED
               JSONException.cpp JSONException.h
               JSONErrorCollector.cpp JSONErrorCollector.h
               JSONContext.h JSONContext.cpp
-              UnorderedIndexedMap.h )
+              UnorderedIndexedMap.h
+              JSONBoostSerialise.h
+              JSONBoostOptional.h
+              JSONBoostPointers.h
+              JSONBoostDateTime.h )
 target_link_libraries ( dvjson PUBLIC Boost::boost )
 set_target_properties ( dvjson PROPERTIES VERSION ${PROJECT_VERSION} )
 get_target_property ( HEADERS dvjson SOURCES )

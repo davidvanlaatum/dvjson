@@ -252,9 +252,3 @@ void JSONParser::parseInto( JSON &value, std::istream &stream ) {
 
   value = *newValue;
 }
-
-JSONParseException::JSONParseException( const std::string &nMessage ) : message( nMessage ) {}
-
-const char *JSONParseException::what() const noexcept {
-  return message.c_str();
-}
