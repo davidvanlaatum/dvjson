@@ -22,8 +22,8 @@ namespace dv {
     class JSON : public std::enable_shared_from_this<JSON>, public JSONTypes {
     public:
       JSON() = default;
-      JSON( const JSON &other ) = default;
-      JSON( JSON &&other ) = default;
+      JSON( const JSON & ) = default;
+      JSON( JSON && ) = default;
 
       template<typename T, detail::enable_if_t<detail::supports_implicit_to_json<T>::value> = 0>
       JSON( T &&v ) { *this = v; }

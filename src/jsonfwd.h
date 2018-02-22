@@ -196,14 +196,18 @@ namespace dv {
     inline std::ostream &operator<<( std::ostream &os, T &json ) {
       detail::writeJSON( os, json );
       return os;
-    };
+    }
     std::ostream &operator<<( std::ostream &os, const JSONDiffListenerImpl &listener );
 
     template<typename T, typename X=detail::uncvref_t<T>, detail::enable_if_t<std::is_same<X, JSON>::value> = 0>
     inline std::istream &operator>>( std::istream &is, T &json ) {
-      readJSON( is, json );
+      detail::readJSON( is, json );
       return is;
-    };
+    }
+
+    inline void PrintTo( const JSON &j, ::std::ostream *os ) {
+      detail::writeJSON( *os, j );
+    }
   }
 }
 
