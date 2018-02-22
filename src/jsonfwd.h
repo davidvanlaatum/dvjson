@@ -193,7 +193,7 @@ namespace dv {
     }
 
     template<typename T, typename X=detail::uncvref_t<T>, detail::enable_if_t<std::is_same<X, JSON>::value> = 0>
-    inline std::ostream &operator<<( std::ostream &os, T &json ) {
+    inline std::ostream &operator<<( std::ostream &os, const T &json ) {
       detail::writeJSON( os, json );
       return os;
     }
