@@ -134,7 +134,7 @@ namespace dv {
         };
         template<typename T> struct has_right {
           template<typename X>
-          static auto check( X * ) -> decltype( std::declval<std::istream>() >> std::declval<X>(), std::true_type() );
+          static auto check( X * ) -> decltype( std::declval<std::istream &>() >> std::declval<X &>(), std::true_type() );
           template<typename> static constexpr std::false_type check( ... );
           typedef decltype( check<T>( nullptr ) ) type;
           static const bool value = type::value;

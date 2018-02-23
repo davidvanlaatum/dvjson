@@ -36,7 +36,7 @@ namespace dv {
         }
 
         template<typename JsonType, typename T>
-        auto call( JsonType &j, std::shared_ptr<T> &&val, const JSONPath &path, PriorityTag<5> ) const
+        auto call( JsonType &j, std::shared_ptr<T> &&val, const JSONPath &path, PriorityTag<6> ) const
         noexcept( noexcept( to_json( j, std::forward<std::shared_ptr<T >>( val ), path ) ) )
         -> decltype( to_json( j, std::forward<std::shared_ptr<T >>( val ), path ), void() ) {
           static_assert( has_to_json<T>::value, "has_to_json returned false" );
@@ -44,7 +44,7 @@ namespace dv {
         }
 
         template<typename JsonType, typename T>
-        auto call( JsonType &j, std::weak_ptr<T> &&val, const JSONPath &path, PriorityTag<4> ) const
+        auto call( JsonType &j, std::weak_ptr<T> &&val, const JSONPath &path, PriorityTag<5> ) const
         noexcept( noexcept( to_json( j, std::forward<std::weak_ptr<T >>( val ), path ) ) )
         -> decltype( to_json( j, std::forward<std::weak_ptr<T >>( val ), path ), void() ) {
           static_assert( has_to_json<T>::value, "has_to_json returned false" );
@@ -52,14 +52,28 @@ namespace dv {
         }
 
         template<typename JsonType, typename T>
-        auto call( JsonType &j, T &&val, const JSONPath &path, PriorityTag<3> ) const
+        auto call( JsonType &j, T &&val, const JSONPath &path, PriorityTag<4> ) const
         noexcept( noexcept( to_json( j, std::forward<T>( val ), path ) ) )
         -> decltype( to_json( j, std::forward<T>( val ), path ), void() ) {
           static_assert( has_to_json<T>::value, "has_to_json returned false" );
           return to_json( j, std::forward<T>( val ), path );
         }
 
-        template<typename JsonType, typename T, typename std::enable_if<is_streamable_object<T>::value, int>::type = 0>
+        template<typename JsonType, typename T>
+        auto call( JsonType &j, T &&val, const JSONPath &path, PriorityTag<4> ) const
+        noexcept( noexcept( std::declval<T>().toJson( j, std::declval<JSONPath &>() ) ) )
+        -> decltype( std::declval<T>().toJson( j, std::declval<JSONPath &>() ), void() ) {
+          return val.toJson( j, path );
+        }
+
+        template<typename JsonType, typename T>
+        auto call( JsonType &j, T &&val, const JSONPath &/*path*/, PriorityTag<3> ) const
+        noexcept( noexcept( std::declval<T>().toJson( j ) ) )
+        -> decltype( std::declval<T>().toJson( j ), void() ) {
+          return val.toJson( j );
+        }
+
+        template<typename JsonType, typename T, enable_if_t<is_streamable_object<T>::value> = 0>
         void call( JsonType &j, T &&val, const JSONPath &/*path*/, PriorityTag<2> ) const {
           std::ostringstream stream;
           stream << val;
@@ -91,15 +105,28 @@ namespace dv {
             : oo( o ), j( json ), path( nPath ) {}
 
           template<typename JsonType, typename Current, typename Other=O>
-          auto call( const JsonType &, Current &, Other &&other, PriorityTag<3> ) const
+          auto call( const JsonType &, Current &, Other &&other, PriorityTag<5> ) const
           -> decltype( from_json( std::declval<const JSON &>(), other, std::declval<JSONPath &>() ), void() ) {
             from_json( j, other, path );
           }
 
+          template<typename JsonType, typename Current, typename Other=O>
+          auto call( const JsonType &, Current &, Other &&other, PriorityTag<4> ) const
+          -> decltype( std::declval<Other>().fromJson( std::declval<const JSON &>(), std::declval<const JSONPath &>() ), void() ) {
+            other.fromJson( j, path );
+          }
+
           template<typename JsonType, typename Current, typename Other=O,
-            typename std::enable_if<std::is_convertible<typename std::remove_reference<Other>::type, Current>::value, int>::type = 0>
-          void call( const JsonType &, Current &val, Other &&other, PriorityTag<2> ) const {
+            detail::enable_if_t<std::is_convertible<detail::uncvref_t<Other>, Current>::value> = 0>
+          auto call( const JsonType &, Current &val, Other &&other, PriorityTag<3> ) const
+          -> decltype( other = val, void() ) {
             other = val;
+          }
+
+          template<typename JsonType, typename Current, typename Other=O>
+          auto call( const JsonType &, Current &, Other &&other, PriorityTag<2> ) const
+          -> decltype( std::declval<Other>().fromJson( std::declval<const JSON &>() ), void() ) {
+            other.fromJson( j );
           }
 
           template<typename JsonType, typename Current, typename Other=O,
@@ -291,6 +318,8 @@ namespace dv {
           return ::dv::json::from_json( std::forward<JsonType>( j ), val, *path );
         }
 
+        // ======================================
+
         template<typename JsonType, typename ValueType>
         static auto
         to_json( JsonType &j, ValueType &&val, const JSONErrorCollectorPtr &collector, const JSONPath &path )
@@ -336,6 +365,8 @@ namespace dv {
           auto path = context.get<JSONPath>();
           return ::dv::json::to_json( j, std::forward<ValueType>( val ), *path );
         }
+
+        // ======================================
 
         template<typename JsonType, typename ValueType>
         static bool compare( JsonType &j, ValueType &&val, const JSONErrorCollectorPtr &collector, const JSONPath &path )

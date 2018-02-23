@@ -1,4 +1,5 @@
 #include "JSONException.h"
+#include <boost/core/typeinfo.hpp>
 
 using namespace dv::json;
 
@@ -18,7 +19,9 @@ JSONParseException::JSONParseException( const std::string &nMessage ) : JSONExce
 
 JSONParseException::JSONParseException( const char *nMessage ) : JSONException( nMessage ) {}
 
-JSONWrongTypeException::JSONWrongTypeException( const std::type_info &nExpected, const std::type_info &nActual ) : expected( nExpected ), actual( nActual ) {}
+JSONWrongTypeException::JSONWrongTypeException( const std::type_info &nExpected, const std::type_info &nActual )
+  : JSONException( "Wrong type expecting " + boost::core::demangled_name( nExpected ) + " got " + boost::core::demangled_name( nActual ) ),
+    expected( nExpected ), actual( nActual ) {}
 
 const std::type_info &JSONWrongTypeException::getExpected() const {
   return expected;

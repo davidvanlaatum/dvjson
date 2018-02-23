@@ -64,8 +64,8 @@ namespace dv {
       bool operator!=( const JSON &other ) const;
       bool operator==( Type ) const noexcept;
       bool operator!=( Type ) const noexcept;
-      template<typename T, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value> = 0> inline bool operator!=( const T &v ) const;
-      template<typename T, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value> = 0> inline bool operator==( const T &v ) const;
+
+      inline const std::type_info &innerType() const { return value.type(); }
 
       template<typename T, typename std::enable_if<not std::is_same<std::string::value_type, T>::value and
                                                    not std::is_pointer<T>::value, int>::type = 0>
@@ -75,6 +75,11 @@ namespace dv {
       template<typename T> inline bool is() const;
       Type type() const noexcept;
       inline JSONPtr sub( const keyType &key ) const noexcept;
+
+      template<typename T> inline T sub( const keyType &key, T &&defaultValue ) const {
+        const auto &val = sub( key );
+        return val ? val->as<T>() : defaultValue;
+      }
 
       bool compare( const JSON &other, JSONDiffListener &listener ) const;
 
@@ -258,12 +263,16 @@ namespace dv {
       return *this;
     }
 
-    template<typename T, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value>> bool JSON::operator==( const T &v ) const {
-      return JSONSerialiser<T>::compare( *this, v );
+    template<typename T, typename JSONType=JSON, detail::enable_if_t<
+      detail::supports_implicit_json_compare<T>::value and std::is_same<JSONType, JSON>::value> = 0>
+    auto operator==( const JSONType &j, const T &v ) -> decltype( JSONSerialiser<T>::compare( j, v ) ) {
+      return JSONSerialiser<T>::compare( j, v );
     }
 
-    template<typename T, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value>> bool JSON::operator!=( const T &v ) const {
-      return !JSONSerialiser<T>::compare( *this, v );
+    template<typename T, typename JSONType=JSON, detail::enable_if_t<
+      detail::supports_implicit_json_compare<T>::value and std::is_same<JSONType, JSON>::value> = 0>
+    auto operator!=( const JSONType &j, const T &v ) -> decltype( JSONSerialiser<T>::compare( j, v ) ) {
+      return !JSONSerialiser<T>::compare( j, v );
     }
   }
 }
