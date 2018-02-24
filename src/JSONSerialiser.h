@@ -5,6 +5,7 @@
 #include "jsonfwd.h"                // for JSONErrorCollectorPtr, defaultErrorCollector, emptyPath, JSONTypes, JSONTypes::valueType, JSONTypes::stringType
 #include "JSONErrorCollector.h"     // for JSONErrorCollector
 #include "JSONContext.h"            // for JSONContext
+#include "JSONPath.h"
 #include <stdlib.h>                 // for abs
 #include <algorithm>                // for forward
 #include <boost/core/demangle.hpp>  // for demangle

@@ -8,9 +8,17 @@
 
 namespace dv {
   namespace json {
-    template<typename T> void to_json( JSON &j, const boost::optional<T> &value, const JSONPath &path ) {
+    template<typename T> inline void to_json( JSON &j, const boost::optional<T> &value, const JSONPath &path ) {
       if ( value.is_initialized() ) {
         JSONSerialiser<T>::to_json( j, value.value(), path );
+      } else {
+        j = nullptr;
+      }
+    }
+
+    template<> inline void to_json( JSON &j, const boost::optional<JSON> &value, const JSONPath &/*path*/ ) {
+      if ( value.is_initialized() ) {
+        j = value.get();
       } else {
         j = nullptr;
       }
@@ -22,6 +30,10 @@ namespace dv {
 
     template<typename T> inline const JSON &json_as( T &, const JSON &j, boost::optional<JSON> * ) {
       return j;
+    }
+
+    namespace detail {
+      template<> struct is_streamable_object_sub<boost::optional<JSON>> { static const bool value = false; };
     }
   }
 }

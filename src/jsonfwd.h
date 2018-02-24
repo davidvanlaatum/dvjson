@@ -122,43 +122,40 @@ namespace dv {
          public:
           static const bool value = not std::is_same<uncvref_t<X>, Y>::value and is_convertible<uncvref_t<X>, Y>::value;
         };
+      template<typename T> struct has_left_shift {
+        template<typename X, typename Y=X> static auto check( X * ) -> decltype( std::declval<std::ostream &>() << std::declval<Y &>(), std::true_type() );
+        template<typename> static constexpr std::false_type check( ... );
+        typedef decltype( check<T>( nullptr ) ) type;
+        static const bool value = type::value;
+      };
+      template<typename T> struct has_right_shift {
+        template<typename X, typename Y=X> static auto check( X * ) -> decltype( std::declval<std::istream &>() >> std::declval<Y &>(), std::true_type() );
+        template<typename> static constexpr std::false_type check( ... );
+        typedef decltype( check<T>( nullptr ) ) type;
+        static const bool value = type::value;
+      };
 
-      template<typename Y, typename Z=uncvref_t<Y>> struct is_streamable_object_sub {
-       private:
-        template<typename T> struct has_left {
-          template<typename X>
-          static auto check( X * ) -> decltype( std::declval<std::ostream &>() << std::declval<X &>(), std::true_type() );
-          template<typename> static constexpr std::false_type check( ... );
-          typedef decltype( check<T>( nullptr ) ) type;
-          static const bool value = type::value;
-        };
-        template<typename T> struct has_right {
-          template<typename X>
-          static auto check( X * ) -> decltype( std::declval<std::istream &>() >> std::declval<X &>(), std::true_type() );
-          template<typename> static constexpr std::false_type check( ... );
-          typedef decltype( check<T>( nullptr ) ) type;
-          static const bool value = type::value;
-        };
-       public:
-        static const bool value = not std::is_fundamental<Z>::value and
-                                  std::is_object<Z>::value and
-                                  has_left<Z>::value and
-                                  has_right<Z>::value;
+      template<typename Y> struct is_streamable_object_sub {
+        static const bool value = std::is_object<Y>::value and
+                                  has_left_shift<Y>::value and
+                                  has_right_shift<Y>::value;
       };
       template<> struct is_streamable_object_sub<std::nullptr_t> { static const bool value = false; };
 
       template<typename T, typename X=uncvref_t<T>>
-        struct is_streamable_object : public std::conditional<is_streamable_object_sub<X>::value, std::true_type, std::false_type>::type {};
+        struct is_streamable_object : public std::conditional<not std::is_fundamental<X>::value and is_streamable_object_sub<X>::value, std::true_type,
+          std::false_type>::type {
+        };
 
       template<typename T>
         struct has_to_json {
-         private:
+        private:
           template<typename X, typename JSONType=JSON>
           static auto check( X * )
           -> decltype( to_json( std::declval<JSONType &>(), std::forward<X>( std::declval<X>() ), std::declval<JSONPath &>() ), std::true_type() );
           template<typename> static constexpr std::false_type check( ... );
           typedef decltype( check<uncvref_t<T>>( 0 ) ) type;
-         public:
+        public:
           static const bool value = type::value;
         };
 
@@ -171,6 +168,7 @@ namespace dv {
             is_streamable_object<T>::value;
         };
 
+
       template<typename T, typename X=uncvref_t<T>>
         struct supports_implicit_json_compare {
           static const bool value =
@@ -180,6 +178,9 @@ namespace dv {
 
       void writeJSON( std::ostream &os, const JSON &json );
       void readJSON( std::istream &is, JSON &json );
+
+      static_assert( supports_implicit_to_json<long int &>::value, "should" );
+      static_assert( supports_implicit_to_json<int &>::value, "should" );
     }
 
     template<typename T, typename JSONType=JSON, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value && std::is_same<T, JSONType>::value> = 0>
