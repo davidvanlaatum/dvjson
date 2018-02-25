@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <map>
+#include <limits>
 
 namespace dv {
   namespace json {
