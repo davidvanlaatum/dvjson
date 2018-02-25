@@ -209,6 +209,8 @@ namespace dv {
     inline void PrintTo( const JSON &j, ::std::ostream *os ) {
       detail::writeJSON( *os, j );
     }
+
+    std::string to_string( const JSON &j );
   }
 }
 

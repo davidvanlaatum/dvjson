@@ -4,6 +4,7 @@
 
 #include "jsonfwd.h"
 #include "JSONSerialiser.h"
+#include "JSONValue.h"
 #include <boost/optional/optional.hpp>
 
 namespace dv {

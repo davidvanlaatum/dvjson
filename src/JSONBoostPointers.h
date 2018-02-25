@@ -3,7 +3,10 @@
 #define DVMON_JSONBOOSTPOINTERS_H
 
 #include <boost/shared_ptr.hpp>
-#include <jsonfwd.h>
+#include <boost/make_shared.hpp>
+#include "jsonfwd.h"
+#include "JSONSerialiser.h"
+#include "JSONValue.h"
 
 namespace dv {
   namespace json {

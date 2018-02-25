@@ -12,7 +12,7 @@ namespace dv {
 
     template<class A, typename std::enable_if<std::is_base_of<boost::archive::detail::interface_oarchive<A>, A>::value, int>::type = 0>
     inline A &operator<<( A &a, const JSON &j ) {
-      a & j.toString();
+      a & to_string( j );
       return a;
     }
 

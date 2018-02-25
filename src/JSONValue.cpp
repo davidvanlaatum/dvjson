@@ -10,6 +10,10 @@
 
 using namespace dv::json;
 
+std::string dv::json::to_string( const JSON &j ) {
+  return j.toString();
+}
+
 void detail::writeJSON( std::ostream &os, const JSON &json ) {
   json.dump( os, 2 );
 }
