@@ -183,13 +183,15 @@ namespace dv {
       static_assert( supports_implicit_to_json<int &>::value, "should" );
     }
 
-    template<typename T, typename JSONType=JSON, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value && std::is_same<T, JSONType>::value> = 0>
-    inline bool operator==( T &&v, const JSONType &j ) {
+    template<typename T, typename JSONType=JSON, detail::enable_if_t<
+      detail::supports_implicit_json_compare<T>::value && std::is_same<JSON, JSONType>::value> = 0>
+    inline auto operator==( T &&v, const JSONType &j ) -> decltype( j == v ) {
       return j == v;
     }
 
-    template<typename T, typename JSONType=JSON, detail::enable_if_t<detail::supports_implicit_json_compare<T>::value && std::is_same<T, JSONType>::value> = 0>
-    inline bool operator!=( T &&v, const JSONType &j ) {
+    template<typename T, typename JSONType=JSON, detail::enable_if_t<
+      detail::supports_implicit_json_compare<T>::value && std::is_same<JSON, JSONType>::value> = 0>
+    inline auto operator!=( T &&v, const JSONType &j ) -> decltype( j != v ) {
       return j != v;
     }
 
@@ -206,9 +208,7 @@ namespace dv {
       return is;
     }
 
-    inline void PrintTo( const JSON &j, ::std::ostream *os ) {
-      detail::writeJSON( *os, j );
-    }
+    void PrintTo( const JSON &j, ::std::ostream *os );
 
     std::string to_string( const JSON &j );
   }

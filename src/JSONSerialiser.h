@@ -26,12 +26,12 @@ namespace dv {
       struct to_json_function {
        private:
         template<typename JsonType, typename T, typename std::enable_if<variant_has_type<T, JSONTypes::valueType>::value, int>::type = 0>
-        void call( JsonType &j, T &&val, const JSONPath &/*path*/, PriorityTag<10> ) const noexcept {
+        void call( JsonType &j, T &&val, const JSONPath &/*path*/, PriorityTag<10> ) const {
           j.value = val;
         }
 
         template<typename JsonType, typename T>
-        auto call( JsonType &j, T &&value, const JSONPath &/*path*/, PriorityTag<9> ) const noexcept
+        auto call( JsonType &j, T &&value, const JSONPath &/*path*/, PriorityTag<9> ) const
         -> decltype( j.value = JSONTypes::stringType( value ), void() ) {
           j.value = JSONTypes::stringType( value );
         }
@@ -99,6 +99,11 @@ namespace dv {
         }
       };
 
+      inline std::ostream &operator<<( std::ostream &os, std::nullptr_t ) {
+        os << "null";
+        return os;
+      }
+
       struct from_json_function {
        private:
         template<typename O> struct visitor : public boost::static_visitor<void> {
@@ -106,33 +111,42 @@ namespace dv {
             : oo( o ), j( json ), path( nPath ) {}
 
           template<typename JsonType, typename Current, typename Other=O>
-          auto call( const JsonType &, Current &, Other &&other, PriorityTag<5> ) const
+          auto call( const JsonType &, Current &, Other &&other, PriorityTag<6> ) const
           -> decltype( from_json( std::declval<const JSON &>(), other, std::declval<JSONPath &>() ), void() ) {
             from_json( j, other, path );
           }
 
           template<typename JsonType, typename Current, typename Other=O>
-          auto call( const JsonType &, Current &, Other &&other, PriorityTag<4> ) const
+          auto call( const JsonType &, Current &, Other &&other, PriorityTag<5> ) const
           -> decltype( std::declval<Other>().fromJson( std::declval<const JSON &>(), std::declval<const JSONPath &>() ), void() ) {
             other.fromJson( j, path );
           }
 
           template<typename JsonType, typename Current, typename Other=O,
             detail::enable_if_t<std::is_convertible<detail::uncvref_t<Other>, Current>::value> = 0>
-          auto call( const JsonType &, Current &val, Other &&other, PriorityTag<3> ) const
+          auto call( const JsonType &, Current &val, Other &&other, PriorityTag<4> ) const
           -> decltype( other = val, void() ) {
             other = val;
           }
 
           template<typename JsonType, typename Current, typename Other=O>
-          auto call( const JsonType &, Current &, Other &&other, PriorityTag<2> ) const
+          auto call( const JsonType &, Current &, Other &&other, PriorityTag<3> ) const
           -> decltype( std::declval<Other>().fromJson( std::declval<const JSON &>() ), void() ) {
             other.fromJson( j );
           }
 
+          template<typename JsonType, typename Current, typename Other=O, enable_if_t<is_streamable_object<Other>::value and
+                                                                                      ( std::is_fundamental<Current>::value or
+                                                                                        is_streamable_object<Current>::value )> = 0>
+          void call( const JsonType &, Current &val, Other &&other, PriorityTag<2> ) const {
+            std::stringstream stream;
+            stream << val;
+            stream >> other;
+          }
+
           template<typename JsonType, typename Current, typename Other=O,
             typename std::enable_if<variant_is_convertible<Other, JSONTypes::valueType>::value, int>::type = 0>
-          void call( JsonType &jo, Current &&, Other &&, PriorityTag<1> ) const noexcept {
+          void call( JsonType &jo, Current &&, Other &&, PriorityTag<1> ) const {
             JSONContext::current()->get<JSONErrorCollector>()->
               error( path, "Can't convert " + jo.type() + " to " + boost::core::demangle( typeid( Other ).name() ) );
           }
@@ -140,7 +154,7 @@ namespace dv {
 #ifndef DISABLE_JSON_MISSING_FUNC
 
           template<typename JsonType, typename Current, typename Other=O>
-          void call( const JsonType &, Current &, Other &&, PriorityTag<0> ) const noexcept {
+          void call( const JsonType &, Current &, Other &&, PriorityTag<0> ) const {
             static_assert( sizeof( JsonType ) == 0, "could not find from_json() method in T's namespace" );
           }
 
@@ -156,7 +170,7 @@ namespace dv {
         };
        public:
         template<typename JsonType, typename T>
-        T &operator()( JsonType &j, T &&val, const JSONPath &path ) const noexcept {
+        T &operator()( JsonType &j, T &&val, const JSONPath &path ) const {
           visitor<T> v( std::forward<T>( val ), j, path );
           j.value.apply_visitor( v );
           return val;
@@ -185,25 +199,26 @@ namespace dv {
           }
 
           template<typename JsonType, typename Current, typename Other=O, typename std::enable_if<are_comparable<Current, Other>::floatValue, int>::type = 0>
-          bool call( JsonType &, Current &&value, Other &&other, PriorityTag<8> ) const noexcept {
+          bool call( JsonType &, Current &&value, Other &&other, PriorityTag<8> ) const {
             return std::abs( other - value ) <= std::numeric_limits<JSONTypes::doubleType>::epsilon();
           }
 
           template<typename JsonType, typename Current, typename Other=O, typename std::enable_if<are_comparable<Other, Current>::value, int>::type = 0>
-          auto call( JsonType &, Current &&value, Other &&other, PriorityTag<7> ) const noexcept -> decltype( value == other ) {
+          auto call( JsonType &, Current &&value, Other &&other, PriorityTag<7> ) const -> decltype( value == other ) {
             return value == other;
           }
 
-          template<typename JsonType, typename Current, typename Other=O,
-            typename std::enable_if<variant_is_convertible<Other, JSONTypes::valueType>::value, int>::type = 0>
-          bool call( JsonType &, Current &&, Other &&, PriorityTag<6> ) const noexcept {
-            return false;
+          template<typename JsonType, typename Current, typename Other=O>
+          auto call( const JsonType &, Current &, Other &&other, PriorityTag<6> ) const
+          noexcept( noexcept( json_compare( std::declval<JsonType>(), std::declval<Other>(), std::declval<JSONPath &>() ) ) ) ->
+          decltype( json_compare( std::declval<JsonType>(), std::declval<Other>(), std::declval<JSONPath &>() ) ) {
+            return json_compare( j, other, path );
           }
 
-          template<typename JsonType, typename Current, typename Other=O>
-          bool call( const JsonType &, Current &, Other &&other, PriorityTag<5> ) const
-          noexcept( noexcept( json_compare( std::declval<JsonType>(), std::declval<Other>(), std::declval<JSONPath &>() ) ) ) {
-            return json_compare( j, other, path );
+          template<typename JsonType, typename Current, typename Other=O,
+            typename std::enable_if<variant_has_type<Other, JSONTypes::valueType>::value, int>::type = 0>
+          bool call( JsonType &, Current &&, Other &&, PriorityTag<5> ) const {
+            return false;
           }
 
 #ifndef DISABLE_JSON_MISSING_FUNC
@@ -220,14 +235,14 @@ namespace dv {
           const JSONPath &path;
 
           template<typename X>
-          bool operator()( X &&val ) const noexcept {
+          bool operator()( X &&val ) const {
             return call( j, std::forward<X>( val ), oo, PriorityTag<10> {} );
           }
         };
 
        public:
         template<typename JsonType, typename T>
-        bool operator()( JsonType &j, T &&val, const JSONPath &path ) const noexcept {
+        bool operator()( JsonType &j, T &&val, const JSONPath &path ) const {
           visitor<T> v( std::forward<T>( val ), j, path );
           return j.value.apply_visitor( v );
         }
@@ -242,7 +257,7 @@ namespace dv {
         }
 
         template<typename JsonType, typename T>
-        T call( const JsonType *, T *, PriorityTag<0> ) const noexcept {
+        T call( const JsonType *, T *, PriorityTag<0> ) const {
           return T();
         }
 

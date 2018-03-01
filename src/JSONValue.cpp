@@ -410,3 +410,11 @@ std::ostream &dv::json::operator<<( std::ostream &os, Type type ) {
   }
   return os;
 }
+
+void dv::json::PrintTo( const JSON &j, ::std::ostream *os ) {
+  if ( j == nullptr ) {
+    *os << "nullptr";
+  } else {
+    detail::writeJSON( *os, j );
+  }
+}

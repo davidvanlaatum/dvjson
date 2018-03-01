@@ -14,7 +14,7 @@ add_library ( dvjson SHARED
               JSONBoostSerialise.h
               JSONBoostOptional.h
               JSONBoostPointers.h
-              JSONBoostDateTime.h )
+              JSONBoostDateTime.h GTestJSON.h )
 target_link_libraries ( dvjson PUBLIC Boost::boost )
 set_target_properties ( dvjson PROPERTIES VERSION ${PROJECT_VERSION} )
 if ( DV_LIB_OUTPUT_DIR )

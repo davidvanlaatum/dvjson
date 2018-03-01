@@ -25,6 +25,24 @@ namespace dv {
       }
     }
 
+    template<typename T> inline void from_json( const JSON &j, boost::optional<T> &value, const JSONPath &path ) {
+      if ( j == nullptr ) {
+        value.reset();
+      } else {
+        T tmp;
+        JSONSerialiser<T>::from_json( j, tmp, path );
+        value = tmp;
+      }
+    }
+
+    template<> inline void from_json( const JSON &j, boost::optional<JSON> &value, const JSONPath &/*path*/) {
+      if ( j == nullptr ) {
+        value.reset();
+      } else {
+        value = j;
+      }
+    }
+
     template<typename T> inline JSON &json_as( T &, JSON &j, boost::optional<JSON> * ) {
       return j;
     }
