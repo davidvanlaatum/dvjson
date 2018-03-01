@@ -124,13 +124,13 @@ namespace dv {
         };
       template<typename T> struct has_left_shift {
         template<typename X, typename Y=X> static auto check( X * ) -> decltype( std::declval<std::ostream &>() << std::declval<Y &>(), std::true_type() );
-        template<typename> static constexpr std::false_type check( ... );
+        template<typename> static std::false_type check( ... );
         typedef decltype( check<T>( nullptr ) ) type;
         static const bool value = type::value;
       };
       template<typename T> struct has_right_shift {
         template<typename X, typename Y=X> static auto check( X * ) -> decltype( std::declval<std::istream &>() >> std::declval<Y &>(), std::true_type() );
-        template<typename> static constexpr std::false_type check( ... );
+        template<typename> static std::false_type check( ... );
         typedef decltype( check<T>( nullptr ) ) type;
         static const bool value = type::value;
       };
@@ -153,7 +153,7 @@ namespace dv {
           template<typename X, typename JSONType=JSON>
           static auto check( X * )
           -> decltype( to_json( std::declval<JSONType &>(), std::forward<X>( std::declval<X>() ), std::declval<JSONPath &>() ), std::true_type() );
-          template<typename> static constexpr std::false_type check( ... );
+          template<typename> static std::false_type check( ... );
           typedef decltype( check<uncvref_t<T>>( 0 ) ) type;
         public:
           static const bool value = type::value;
