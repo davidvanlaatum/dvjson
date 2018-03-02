@@ -137,7 +137,7 @@ namespace dv {
 
           template<typename JsonType, typename Current, typename Other=O, enable_if_t<is_streamable_object<Other>::value and
                                                                                       ( std::is_fundamental<Current>::value or
-                                                                                        is_streamable_object<Current>::value )> = 0>
+                                                                                        std::is_same<Current, std::string>::value )> = 0>
           void call( const JsonType &, Current &val, Other &&other, PriorityTag<2> ) const {
             std::stringstream stream;
             stream << val;
