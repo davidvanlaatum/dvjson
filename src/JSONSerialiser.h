@@ -122,8 +122,7 @@ namespace dv {
             other.fromJson( j, path );
           }
 
-          template<typename JsonType, typename Current, typename Other=O,
-            detail::enable_if_t<std::is_convertible<detail::uncvref_t<Other>, Current>::value> = 0>
+          template<typename JsonType, typename Current, typename Other=O, enable_if_t<std::is_convertible<uncvref_t<Other>, Current>::value> = 0>
           auto call( const JsonType &, Current &val, Other &&other, PriorityTag<4> ) const
           -> decltype( other = val, void() ) {
             other = val;
@@ -177,16 +176,6 @@ namespace dv {
         }
       };
 
-      template<typename A, typename B> struct are_comparable {
-        typedef typename std::remove_reference<typename std::remove_const<A>::type>::type X;
-        typedef typename std::remove_reference<typename std::remove_const<B>::type>::type Y;
-        static const bool floatValue =
-          ( std::is_floating_point<X>::value && std::is_integral<Y>::value ) ||
-          ( std::is_floating_point<Y>::value && std::is_integral<X>::value ) ||
-          ( std::is_floating_point<X>::value && std::is_floating_point<Y>::value );
-        static const bool value = std::is_convertible<X, Y>::value && !floatValue;
-      };
-
       struct json_compare_function {
        private:
         template<typename O> struct visitor : public boost::static_visitor<bool> {
@@ -198,12 +187,12 @@ namespace dv {
             return std::is_same<typename std::remove_const<typename std::remove_reference<Other>::type>::type, std::nullptr_t>::value;
           }
 
-          template<typename JsonType, typename Current, typename Other=O, typename std::enable_if<are_comparable<Current, Other>::floatValue, int>::type = 0>
+          template<typename JsonType, typename Current, typename Other=O, enable_if_t<is_float_compare<Current, Other>::value> = 0>
           bool call( JsonType &, Current &&value, Other &&other, PriorityTag<8> ) const {
             return std::abs( other - value ) <= std::numeric_limits<JSONTypes::doubleType>::epsilon();
           }
 
-          template<typename JsonType, typename Current, typename Other=O, typename std::enable_if<are_comparable<Other, Current>::value, int>::type = 0>
+          template<typename JsonType, typename Current, typename Other=O, enable_if_t<are_comparable<Other, Current>::value> = 0>
           auto call( JsonType &, Current &&value, Other &&other, PriorityTag<7> ) const -> decltype( value == other ) {
             return value == other;
           }
@@ -215,8 +204,7 @@ namespace dv {
             return json_compare( j, other, path );
           }
 
-          template<typename JsonType, typename Current, typename Other=O,
-            typename std::enable_if<variant_has_type<Other, JSONTypes::valueType>::value, int>::type = 0>
+          template<typename JsonType, typename Current, typename Other=O, enable_if_t<variant_is_convertible<Other, JSONTypes::valueType>::value> = 0>
           bool call( JsonType &, Current &&, Other &&, PriorityTag<5> ) const {
             return false;
           }

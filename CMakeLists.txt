@@ -1,3 +1,7 @@
+if ( SUBBUILD_DVJSON )
+  message ( STATUS "Begin dvjson" )
+endif ()
+
 list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" )
 cmake_minimum_required ( VERSION 3.6 )
 
@@ -13,13 +17,13 @@ find_program ( CLANGPP NAMES clang++ ${CLANGPP_ALIASES} HINTS /opt/local/bin )
 set ( CXX $ENV{CXX} )
 set ( CC $ENV{CC} )
 if ( CLANG AND CLANGPP AND ( NOT CC ) AND ( NOT CXX ) AND NOT CMAKE_CXX_COMPILER AND NOT CMAKE_C_COMPILER )
-    if ( NOT CMAKE_C_COMPILER )
-        set ( CMAKE_C_COMPILER ${CLANG} )
-    endif ()
-    if ( NOT CMAKE_CXX_COMPILER )
-        set ( CMAKE_CXX_COMPILER ${CLANGPP} )
-    endif ()
-    message ( STATUS "Found clang" )
+  if ( NOT CMAKE_C_COMPILER )
+    set ( CMAKE_C_COMPILER ${CLANG} )
+  endif ()
+  if ( NOT CMAKE_CXX_COMPILER )
+    set ( CMAKE_CXX_COMPILER ${CLANGPP} )
+  endif ()
+  message ( STATUS "Found clang" )
 endif ()
 
 project ( dvjson VERSION 1.0.0 )
@@ -29,7 +33,7 @@ endif ()
 set ( CMAKE_CXX_STANDARD 11 )
 set ( CMAKE_CXX_STANDARD_REQUIRED ON )
 if ( NOT ${CMAKE_VERSION} VERSION_LESS 3.9 )
-    cmake_policy ( SET CMP0068 NEW )
+  cmake_policy ( SET CMP0068 NEW )
 endif ()
 
 if ( NOT DEFINED SUBBUILD_DVJSON )
@@ -53,7 +57,7 @@ if ( NOT DEFINED SUBBUILD_DVJSON )
 endif ()
 find_package ( Boost 1.60 REQUIRED )
 if ( NOT TARGET Boost::boost )
-    message ( FATAL_ERROR "Boost cmake module not found!" )
+  message ( FATAL_ERROR "Boost cmake module not found!" )
 endif ()
 
 checkandaddflag ( -Weverything CMAKE_CXX_FLAGS )
@@ -62,7 +66,6 @@ checkandaddflag ( -Wextra CMAKE_CXX_FLAGS )
 checkandaddflag ( -fdebug-macro CMAKE_CXX_FLAGS )
 checkandaddflag ( -fmerge-constants CMAKE_CXX_FLAGS )
 checkandaddflag ( -fspell-checking CMAKE_CXX_FLAGS )
-checkandaddflag ( -pipe CMAKE_CXX_FLAGS )
 checkandaddflag ( -Wall CMAKE_CXX_FLAGS )
 checkandaddflag ( -Wextra CMAKE_CXX_FLAGS )
 checkandaddflag ( -Wunused CMAKE_CXX_FLAGS )
@@ -104,16 +107,16 @@ endif ()
 
 include ( CMakePackageConfigHelpers )
 write_basic_package_version_file ( "${CMAKE_CURRENT_BINARY_DIR}/dvjsonVersion.cmake"
-        VERSION ${PROJECT_VERSION} COMPATIBILITY AnyNewerVersion )
+                                   VERSION ${PROJECT_VERSION} COMPATIBILITY AnyNewerVersion )
 export ( EXPORT dvjson FILE "${CMAKE_CURRENT_BINARY_DIR}/dvjsonConfig.cmake" )
 install ( EXPORT dvjson
-        FILE dvjsonConfig.cmake
-        DESTINATION lib/cmake/dvjson
-        )
+          FILE dvjsonConfig.cmake
+          DESTINATION lib/cmake/dvjson
+          )
 install ( FILES "${CMAKE_CURRENT_BINARY_DIR}/dvjsonVersion.cmake"
-        DESTINATION lib/cmake/dvjson
-        COMPONENT Devel
-        )
+          DESTINATION lib/cmake/dvjson
+          COMPONENT Devel
+          )
 if ( NOT DEFINED SUBBUILD_DVJSON )
   feature_summary ( WHAT ALL )
   message ( STATUS "CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER}" )
@@ -142,4 +145,8 @@ if ( NOT DEFINED SUBBUILD_DVJSON )
                         ${COMMANDS}
                         )
   endif ()
+endif ()
+
+if ( SUBBUILD_DVJSON )
+  message ( STATUS "End dvjson" )
 endif ()

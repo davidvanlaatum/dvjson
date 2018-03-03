@@ -176,6 +176,22 @@ namespace dv {
             not std::is_same<X, JSONPtr>::value;
         };
 
+      template<typename A, typename B, typename X=uncvref_t<A>, typename Y=uncvref_t<B>> struct is_float_compare {
+        static const bool value =
+          ( std::is_floating_point<X>::value && std::is_integral<Y>::value ) ||
+          ( std::is_integral<X>::value && std::is_floating_point<Y>::value ) ||
+          ( std::is_floating_point<X>::value && std::is_floating_point<Y>::value );
+      };
+
+      template<typename A, typename B> struct are_comparable {
+        typedef typename std::remove_reference<typename std::remove_const<A>::type>::type X;
+        typedef typename std::remove_reference<typename std::remove_const<B>::type>::type Y;
+        template<typename X, typename Y, enable_if_t<!is_float_compare<X, Y>::value> = 0>
+        static auto check( X *, Y * ) -> decltype( std::declval<X>() == std::declval<Y>(), int() );
+        template<typename...> static char check( ... );
+        static const bool value = std::is_convertible<X, Y>::value && sizeof( check<X, Y>( nullptr, nullptr ) ) == sizeof( int );
+      };
+
       void writeJSON( std::ostream &os, const JSON &json );
       void readJSON( std::istream &is, JSON &json );
 

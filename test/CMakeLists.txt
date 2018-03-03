@@ -25,4 +25,6 @@ if ( VALGRIND_PATH )
             "VALGRIND=${VALGRIND_PATH}"
             )
 endif ()
-iwyu_target ( testjson )
+if ( NOT SUBBUILD_DVJSON )
+  iwyu_target ( testjson )
+endif ()
