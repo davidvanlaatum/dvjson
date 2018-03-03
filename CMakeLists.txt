@@ -101,7 +101,7 @@ checkandaddflag ( -fdiagnostics-color CMAKE_CXX_FLAGS )
 checkandaddflag ( -fcolor-diagnostics CMAKE_CXX_FLAGS )
 
 add_subdirectory ( src )
-if ( BUILD_TESTING )
+if (( NOT DEFINED SUBBUILD_DVJSON OR SUBBUILD_TESTING ) AND BUILD_TESTING )
   add_subdirectory ( test )
 endif ()
 
