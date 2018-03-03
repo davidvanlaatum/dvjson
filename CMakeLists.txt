@@ -111,6 +111,7 @@ write_basic_package_version_file ( "${CMAKE_CURRENT_BINARY_DIR}/dvjsonVersion.cm
 export ( EXPORT dvjson FILE "${CMAKE_CURRENT_BINARY_DIR}/dvjsonConfig.cmake" )
 install ( EXPORT dvjson
           FILE dvjsonConfig.cmake
+          COMPONENT Devel
           DESTINATION lib/cmake/dvjson
           )
 install ( FILES "${CMAKE_CURRENT_BINARY_DIR}/dvjsonVersion.cmake"

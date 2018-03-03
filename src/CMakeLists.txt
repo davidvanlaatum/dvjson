@@ -14,7 +14,7 @@ add_library ( dvjson SHARED
               JSONBoostSerialise.h
               JSONBoostOptional.h
               JSONBoostPointers.h
-              JSONBoostDateTime.h GTestJSON.h )
+              JSONBoostDateTime.h )
 target_link_libraries ( dvjson PUBLIC Boost::boost )
 set_target_properties ( dvjson PROPERTIES VERSION ${PROJECT_VERSION} )
 if ( DV_LIB_OUTPUT_DIR )
@@ -34,3 +34,9 @@ if ( NOT SUBBUILD_DVJSON )
   iwyu_target ( dvjson )
   clang_tidy_target ( dvjson )
 endif ()
+
+include ( installheaderlib )
+add_library ( dvjsontest INTERFACE )
+target_sources ( dvjsontest INTERFACE GTestJSON.h )
+target_include_directories ( dvjsontest INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}> $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/dvjson/> )
+install_header_lib ( TARGETS dvjsontest EXPORT dvjson DESTINATION include/dvjson/ COMPONENT Devel )
