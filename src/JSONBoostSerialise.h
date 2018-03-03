@@ -10,14 +10,18 @@
 namespace dv {
   namespace json {
 
-    template<class A, typename std::enable_if<std::is_base_of<boost::archive::detail::interface_oarchive<A>, A>::value, int>::type = 0>
-    inline A &operator<<( A &a, const JSON &j ) {
+    template<class A, typename JSONType=JSON, typename std::enable_if<std::is_same<JSONType, JSON>::value
+                                                                      and std::is_base_of<boost::archive::detail::interface_oarchive<A>, A>::value,
+      int>::type = 0>
+    inline A &operator<<( A &a, const JSONType &j ) {
       a & to_string( j );
       return a;
     }
 
-    template<class A, typename std::enable_if<std::is_base_of<boost::archive::detail::interface_iarchive<A>, A>::value, int>::type = 0>
-    inline A &operator>>( A &a, JSON &j ) {
+    template<class A, typename JSONType=JSON, typename std::enable_if<std::is_same<JSONType, JSON>::value
+                                                                      and std::is_base_of<boost::archive::detail::interface_iarchive<A>, A>::value,
+      int>::type = 0>
+    inline A &operator>>( A &a, JSONType &j ) {
       std::string value;
       a & value;
       JSONParser parser;

@@ -112,10 +112,10 @@ export ( EXPORT dvjson FILE "${CMAKE_CURRENT_BINARY_DIR}/dvjsonConfig.cmake" )
 install ( EXPORT dvjson
           FILE dvjsonConfig.cmake
           COMPONENT Devel
-          DESTINATION lib/cmake/dvjson
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dvjson
           )
 install ( FILES "${CMAKE_CURRENT_BINARY_DIR}/dvjsonVersion.cmake"
-          DESTINATION lib/cmake/dvjson
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dvjson
           COMPONENT Devel
           )
 if ( NOT DEFINED SUBBUILD_DVJSON )

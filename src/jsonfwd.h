@@ -123,16 +123,14 @@ namespace dv {
           static const bool value = not std::is_same<uncvref_t<X>, Y>::value and is_convertible<uncvref_t<X>, Y>::value;
         };
       template<typename T> struct has_left_shift {
-        template<typename X, typename Y=X> static auto check( X * ) -> decltype( std::declval<std::ostream &>() << std::declval<Y &>(), std::true_type() );
-        template<typename> static std::false_type check( ... );
-        typedef decltype( check<T>( nullptr ) ) type;
-        static const bool value = type::value;
+        template<typename X, typename Y=X> static auto check( X * ) -> decltype( std::declval<std::ostream &>() << std::declval<Y &>(), int() );
+        template<typename> static char check( ... );
+        static const bool value = sizeof( check<T>( nullptr ) ) == sizeof( int );
       };
       template<typename T> struct has_right_shift {
-        template<typename X, typename Y=X> static auto check( X * ) -> decltype( std::declval<std::istream &>() >> std::declval<Y &>(), std::true_type() );
-        template<typename> static std::false_type check( ... );
-        typedef decltype( check<T>( nullptr ) ) type;
-        static const bool value = type::value;
+        template<typename X, typename Y=X> static auto check( X * ) -> decltype( std::declval<std::istream &>() >> std::declval<Y &>(), int() );
+        template<typename> static char check( ... );
+        static const bool value = sizeof( check<T>( nullptr ) ) == sizeof( int );
       };
 
       template<typename Y> struct is_streamable_object_sub {
@@ -143,8 +141,8 @@ namespace dv {
       template<> struct is_streamable_object_sub<std::nullptr_t> { static const bool value = false; };
 
       template<typename T, typename X=uncvref_t<T>>
-        struct is_streamable_object : public std::conditional<not std::is_fundamental<X>::value and is_streamable_object_sub<X>::value, std::true_type,
-          std::false_type>::type {
+        struct is_streamable_object {
+          static const bool value = not std::is_fundamental<X>::value and is_streamable_object_sub<X>::value;
         };
 
       template<typename T>
